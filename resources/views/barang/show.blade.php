@@ -31,13 +31,15 @@
                                     
                                     <div class="mb-4">
                                         <p class="text-sm text-gray-600">Kategori</p>
-                                        <p class="font-semibold">{{ $barang->kategori->nama ?? 'N/A' }}</p>
+                                        <p class="font-semibold">{{ $kategoriLabel }}</p>
                                     </div>
                                     
+                                    @if($barang->kategori == 'perpustakaan')
                                     <div class="mb-4">
                                         <p class="text-sm text-gray-600">Sub Kategori</p>
-                                        <p class="font-semibold">{{ $barang->subKategori->nama ?? 'N/A' }}</p>
+                                        <p class="font-semibold">{{ $subKategoriLabel ?? 'N/A' }}</p>
                                     </div>
+                                    @endif
 
                                     <div class="mb-4">
                                         <p class="text-sm text-gray-600">Kondisi</p>

@@ -63,9 +63,9 @@ class LaporanController extends Controller
      */
     public function inventaris(Request $request)
     {
-        $barangs = Barang::with('kategori', 'subKategori')->get();
-        
-        return view('laporan.inventaris', compact('barangs'));
+        // Redirect to barang report since inventaris view doesn't exist
+        return redirect()->route('laporan.barang')
+            ->with('info', 'Laporan inventaris dialihkan ke laporan barang');
     }
     
     /**
@@ -73,7 +73,7 @@ class LaporanController extends Controller
      */
     public function barang(Request $request)
     {
-        $barang = Barang::with('kategori', 'subKategori')->get();
+        $barang = Barang::all();
         
         return view('laporan.barang', compact('barang'));
     }
@@ -159,10 +159,17 @@ class LaporanController extends Controller
         
         switch ($type) {
             case 'inventaris':
-                $barangs = Barang::with('kategori', 'subKategori')->get();
+                // Redirect to barang export as inventaris export doesn't exist
+                return redirect()->route('laporan.export', ['type' => 'barang', 'format' => $format])
+                    ->with('info', 'Export inventaris dialihkan ke export barang');
+                break;
+                
+            case 'barang':
+                $barangs = Barang::all();
                 
                 if ($format === 'pdf') {
-                    $pdf = PDF::loadView('laporan.exports.inventaris_pdf', compact('barangs'));
+                    // Use simple PDF generation since view might not exist
+                    $pdf = PDF::loadView('laporan.exports.barang_pdf', compact('barangs'));
                     return $pdf->download($fileName . '.pdf');
                 } else {
                     return Excel::download(new BarangExport($barangs), $fileName . '.xlsx');

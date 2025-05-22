@@ -15,13 +15,68 @@
                 Dashboard
             </a>
 
-            <!-- Barang (Equipment) -->
-            <a href="{{ route('barang.index') }}" class="{{ request()->routeIs('barang.*') ? 'bg-blue-100 text-blue-600' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">
-                <svg class="mr-3 flex-shrink-0 h-6 w-6 {{ request()->routeIs('barang.*') ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-500' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                </svg>
-                Barang
-            </a>
+            <!-- Barang (Equipment) with Dropdown -->
+            <div x-data="{ open: {{ request()->routeIs('barang.*') ? 'true' : 'false' }} }" class="space-y-1">
+                <button @click="open = !open" type="button" class="{{ request()->routeIs('barang.*') ? 'bg-blue-100 text-blue-600' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md w-full text-left">
+                    <svg class="mr-3 flex-shrink-0 h-6 w-6 {{ request()->routeIs('barang.*') ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-500' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                    </svg>
+                    Barang
+                    <svg class="ml-auto h-5 w-5 transform transition-transform duration-200" :class="{'rotate-90': open}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+                
+                <div x-show="open" class="pl-8 space-y-1">
+                    <!-- All Items -->
+                    <a href="{{ route('barang.index') }}" class="{{ request()->routeIs('barang.index') && !request()->has('kategori') ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-700' }} block px-2 py-1 text-sm">
+                        Semua Barang
+                    </a>
+                    
+                    <!-- Create Item -->
+                    <a href="{{ route('barang.create') }}" class="{{ request()->routeIs('barang.create') ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-700' }} block px-2 py-1 text-sm">
+                        Tambah Barang
+                    </a>
+                    
+                    <!-- Manage Items -->
+                    <a href="{{ route('barang.manage') }}" class="{{ request()->routeIs('barang.manage') ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-700' }} block px-2 py-1 text-sm">
+                        Hapus Barang
+                    </a>
+                    
+                    <!-- Categories -->
+                    @foreach(config('categories') as $key => $category)
+                        @if(is_array($category) && $key === 'perpustakaan')
+                            <!-- Perpustakaan with subcategories -->
+                            <div x-data="{ open: {{ request()->has('kategori') && request('kategori') === $key ? 'true' : 'false' }} }" class="space-y-1 mt-1">
+                                <button @click="open = !open" type="button" class="{{ request()->has('kategori') && request('kategori') === $key ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-700' }} flex items-center px-2 py-1 text-sm rounded-md w-full text-left">
+                                    {{ $category['label'] }}
+                                    <svg class="ml-auto h-4 w-4 transform transition-transform duration-200" :class="{'rotate-90': open}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                                <div x-show="open" class="pl-4">
+                                    <!-- All perpustakaan items -->
+                                    <a href="{{ route('barang.index', ['kategori' => $key]) }}" class="{{ request()->has('kategori') && request('kategori') === $key && !request()->has('sub') ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-700' }} block px-2 py-1 text-sm">
+                                        Semua {{ $category['label'] }}
+                                    </a>
+                                    
+                                    <!-- Subcategories -->
+                                    @foreach($category['sub'] as $subKey => $subValue)
+                                        <a href="{{ route('barang.index', ['kategori' => $key, 'sub' => $subKey]) }}" class="{{ request()->has('kategori') && request('kategori') === $key && request('sub') === $subKey ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-700' }} block px-2 py-1 text-sm">
+                                            {{ $subValue }}
+                                        </a>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @elseif(!is_array($category))
+                            <!-- Regular category -->
+                            <a href="{{ route('barang.index', ['kategori' => $key]) }}" class="{{ request()->has('kategori') && request('kategori') === $key ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-700' }} block px-2 py-1 text-sm">
+                                {{ $category }}
+                            </a>
+                        @endif
+                    @endforeach
+                </div>
+            </div>
 
             <!-- Peminjaman (Borrowing) -->
             <a href="{{ route('peminjaman.index') }}" class="{{ request()->routeIs('peminjaman.*') ? 'bg-blue-100 text-blue-600' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">
@@ -37,14 +92,6 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                 </svg>
                 Laporan
-            </a>
-
-            <!-- Kategori (Categories) -->
-            <a href="{{ route('kategori.index') }}" class="{{ request()->routeIs('kategori.*') ? 'bg-blue-100 text-blue-600' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">
-                <svg class="mr-3 flex-shrink-0 h-6 w-6 {{ request()->routeIs('kategori.*') ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-500' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-                </svg>
-                Kategori
             </a>
 
             <!-- Pengguna (Users) -->

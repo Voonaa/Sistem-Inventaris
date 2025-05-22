@@ -3,11 +3,9 @@
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\BukuController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\PeminjamanController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RiwayatBarangController;
-use App\Http\Controllers\SubKategoriController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\PenggunaController;
 use App\Http\Controllers\HistoryController;
@@ -32,14 +30,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     // Admin & Operator routes - Using auth middleware only, role check is in controllers
     Route::middleware(['auth'])->group(function () {
-        // Kategori
-        Route::resource('kategori', KategoriController::class);
-        
-        // SubKategori
-        Route::resource('subkategori', SubKategoriController::class);
-        
-        // Barang - Already has role check in controller
-        Route::resource('barang', BarangController::class);
+        // Barang - Main route for filtered views
+        Route::get('/barang', [BarangController::class, 'index'])->name('barang.index');
+        Route::get('/barang/manage', [BarangController::class, 'manage'])->name('barang.manage');
+        Route::post('/barang/bulk-destroy', [BarangController::class, 'bulkDestroy'])->name('barang.bulk-destroy');
+        Route::resource('barang', BarangController::class)->except(['index']);
         
         // Buku management
         Route::get('/buku/create', [BukuController::class, 'create'])->name('buku.create');
@@ -64,6 +59,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/laporan/buku', [LaporanController::class, 'buku'])->name('laporan.buku');
         Route::get('/laporan/peminjaman', [LaporanController::class, 'peminjaman'])->name('laporan.peminjaman');
         Route::get('/laporan/riwayat-barang', [LaporanController::class, 'riwayatBarang'])->name('laporan.riwayat-barang');
+        Route::get('/laporan/export/{type}', [LaporanController::class, 'export'])->name('laporan.export');
         
         // Pengguna (User Management)
         Route::resource('pengguna', PenggunaController::class);

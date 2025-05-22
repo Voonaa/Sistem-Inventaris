@@ -12,6 +12,25 @@
                     <h2 class="text-lg font-semibold text-gray-900">Daftar Peminjaman</h2>
                 </div>
 
+                <!-- Summary Section -->
+                <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                    <h3 class="text-md font-medium text-gray-700 mb-3">Informasi Ringkas</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-white p-3 rounded-md shadow-sm border border-gray-200">
+                            <div class="text-sm text-gray-500">Total Peminjaman</div>
+                            <div class="text-xl font-semibold">{{ count($peminjamans) }}</div>
+                        </div>
+                        <div class="bg-white p-3 rounded-md shadow-sm border border-gray-200">
+                            <div class="text-sm text-gray-500">Masih Dipinjam</div>
+                            <div class="text-xl font-semibold">{{ $peminjamans->where('status', 'dipinjam')->count() }}</div>
+                        </div>
+                        <div class="bg-white p-3 rounded-md shadow-sm border border-gray-200">
+                            <div class="text-sm text-gray-500">Sudah Dikembalikan</div>
+                            <div class="text-xl font-semibold">{{ $peminjamans->where('status', 'dikembalikan')->count() }}</div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="overflow-x-auto">
                     <x-table>
                         <x-slot name="header">
@@ -23,7 +42,7 @@
                             <x-table.heading>Status</x-table.heading>
                         </x-slot>
 
-                        @forelse($peminjaman as $item)
+                        @forelse($peminjamans as $item)
                             <tr>
                                 <x-table.cell>{{ $item->id }}</x-table.cell>
                                 <x-table.cell>{{ $item->user->name ?? 'N/A' }}</x-table.cell>

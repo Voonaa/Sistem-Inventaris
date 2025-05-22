@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Str;
 
 class Barang extends Model
 {
@@ -21,8 +22,8 @@ class Barang extends Model
         'kode_barang',
         'nama_barang',
         'deskripsi',
-        'kategori_id',
-        'sub_kategori_id',
+        'kategori',
+        'sub_kategori',
         'merek',
         'model',
         'nomor_seri',
@@ -55,20 +56,9 @@ class Barang extends Model
     ];
     
     /**
-     * Get the kategori that owns the barang.
+     * Appends these accessor attributes to every query.
      */
-    public function kategori(): BelongsTo
-    {
-        return $this->belongsTo(Kategori::class);
-    }
-    
-    /**
-     * Get the sub-kategori that owns the barang.
-     */
-    public function subKategori(): BelongsTo
-    {
-        return $this->belongsTo(SubKategori::class);
-    }
+    protected $appends = ['kategori_label', 'sub_kategori_label'];
     
     /**
      * Get the buku associated with the barang.
@@ -108,5 +98,62 @@ class Barang extends Model
     public function updatedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'updated_by');
+    }
+    
+    /**
+     * Virtual relationship for category - returns the category data.
+     * Used to make eager loading with('kategori') work for reports.
+     */
+    public function kategori()
+    {
+        // This is a virtual relationship to make eager loading work
+        return $this->belongsTo(self::class)->addEagerConstraints([]);
+    }
+    
+    /**
+     * Virtual relationship for sub category - returns the sub category data.
+     * Used to make eager loading with('subKategori') work for reports.
+     */
+    public function subKategori()
+    {
+        // Always return a valid relationship instance
+        return $this->belongsTo(self::class)->whereRaw('1 = 0'); // Empty relationship that will never match
+    }
+    
+    /**
+     * Get kategori label accessor.
+     */
+    public function getKategoriLabelAttribute()
+    {
+        $categories = config('categories', []);
+        
+        if (isset($categories[$this->kategori])) {
+            if (is_array($categories[$this->kategori]) && isset($categories[$this->kategori]['label'])) {
+                return $categories[$this->kategori]['label'];
+            } elseif (is_string($categories[$this->kategori])) {
+                return $categories[$this->kategori];
+            }
+        }
+        
+        return Str::title(str_replace('_', ' ', $this->kategori));
+    }
+    
+    /**
+     * Get sub kategori label accessor.
+     */
+    public function getSubKategoriLabelAttribute()
+    {
+        if (!$this->sub_kategori) {
+            return null;
+        }
+        
+        $categories = config('categories', []);
+        
+        if ($this->kategori === 'perpustakaan' && 
+            isset($categories[$this->kategori]['sub'][$this->sub_kategori])) {
+            return $categories[$this->kategori]['sub'][$this->sub_kategori];
+        }
+        
+        return Str::title(str_replace('_', ' ', $this->sub_kategori));
     }
 }

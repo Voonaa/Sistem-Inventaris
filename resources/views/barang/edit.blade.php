@@ -11,24 +11,10 @@
                 <div class="p-6 bg-white border-b border-gray-200">
                     <form action="{{ route('barang.update', $barang->id) }}" method="POST" enctype="multipart/form-data"
                           x-data="{ 
-                              kategoriId: '{{ old('kategori_id', $barang->kategori_id) }}', 
-                              subKategoris: [],
-                              oldSubKategoriId: '{{ old('sub_kategori_id', $barang->sub_kategori_id) }}',
-                              async getSubKategoris() {
-                                  if (!this.kategoriId) {
-                                      this.subKategoris = [];
-                                      return;
-                                  }
-                                  try {
-                                      const response = await fetch(`/api/sub-kategoris?kategori_id=${this.kategoriId}`);
-                                      this.subKategoris = await response.json();
-                                  } catch (error) {
-                                      console.error('Error loading subcategories:', error);
-                                      this.subKategoris = [];
-                                  }
-                              }
+                              kategori: '{{ old('kategori', $barang->kategori) }}', 
+                              showSubKategori: false
                           }"
-                          x-init="getSubKategoris()">
+                          x-init="showSubKategori = kategori === 'perpustakaan'">
                         @csrf
                         @method('PUT')
                         
@@ -49,48 +35,54 @@
                             
                             <!-- Kategori -->
                             <div>
-                                <x-input-label for="kategori_id" :value="__('Kategori')" />
-                                <select id="kategori_id" name="kategori_id" 
+                                <x-input-label for="kategori" :value="__('Kategori')" />
+                                <select id="kategori" name="kategori" 
                                         class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm block mt-1 w-full" 
                                         required
-                                        x-model="kategoriId"
-                                        x-on:change="getSubKategoris()">
+                                        x-model="kategori"
+                                        x-on:change="showSubKategori = (kategori === 'perpustakaan')">
                                     <option value="">Pilih Kategori</option>
-                                    @foreach($kategoris as $kategori)
-                                        <option value="{{ $kategori->id }}" {{ old('kategori_id', $barang->kategori_id) == $kategori->id ? 'selected' : '' }}>{{ $kategori->nama }}</option>
+                                    @foreach($categories as $key => $category)
+                                        @if(is_array($category))
+                                            <option value="{{ $key }}" {{ old('kategori', $barang->kategori) == $key ? 'selected' : '' }}>{{ $category['label'] }}</option>
+                                        @else
+                                            <option value="{{ $key }}" {{ old('kategori', $barang->kategori) == $key ? 'selected' : '' }}>{{ $category }}</option>
+                                        @endif
                                     @endforeach
                                 </select>
-                                <x-input-error :messages="$errors->get('kategori_id')" class="mt-2" />
+                                <x-input-error :messages="$errors->get('kategori')" class="mt-2" />
                             </div>
                             
-                            <!-- Sub Kategori -->
-                            <div>
-                                <x-input-label for="sub_kategori_id" :value="__('Sub Kategori')" />
-                                <select id="sub_kategori_id" name="sub_kategori_id" 
+                            <!-- Sub Kategori (Only for Perpustakaan) -->
+                            <div x-show="showSubKategori">
+                                <x-input-label for="sub_kategori" :value="__('Sub Kategori')" />
+                                <select id="sub_kategori" name="sub_kategori" 
                                         class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm block mt-1 w-full" 
-                                        required>
+                                        :required="showSubKategori">
                                     <option value="">Pilih Sub Kategori</option>
-                                    <template x-for="subKategori in subKategoris" :key="subKategori.id">
-                                        <option :value="subKategori.id" 
-                                                x-text="subKategori.nama"
-                                                :selected="oldSubKategoriId == subKategori.id"></option>
-                                    </template>
+                                    @foreach($categories['perpustakaan']['sub'] as $subKey => $subValue)
+                                        <option value="{{ $subKey }}" {{ old('sub_kategori', $barang->sub_kategori) == $subKey ? 'selected' : '' }}>
+                                            {{ $subValue }}
+                                        </option>
+                                    @endforeach
                                 </select>
-                                <x-input-error :messages="$errors->get('sub_kategori_id')" class="mt-2" />
+                                <x-input-error :messages="$errors->get('sub_kategori')" class="mt-2" />
                             </div>
                             
                             <!-- Jumlah -->
                             <div>
-                                <x-input-label for="jumlah" :value="__('Jumlah')" />
-                                <x-text-input id="jumlah" class="block mt-1 w-full" type="number" name="jumlah" :value="old('jumlah', $barang->jumlah)" min="0" required />
+                                <x-input-label for="jumlah" :value="__('Jumlah Barang')" />
+                                <x-text-input id="jumlah" class="block mt-1 w-full" type="number" name="jumlah" :value="old('jumlah', $barang->jumlah)" min="1" required />
+                                <p class="text-xs text-gray-500 mt-1">Jumlah total barang</p>
                                 <x-input-error :messages="$errors->get('jumlah')" class="mt-2" />
                             </div>
                             
-                            <!-- Jumlah Tersedia -->
+                            <!-- Stok Tersedia (Read-only) -->
                             <div>
-                                <x-input-label for="stok" :value="__('Stok')" />
-                                <x-text-input id="stok" class="block mt-1 w-full" type="number" name="stok" :value="old('stok', $barang->stok)" min="0" required />
-                                <x-input-error :messages="$errors->get('stok')" class="mt-2" />
+                                <x-input-label for="stok_display" :value="__('Stok Tersedia')" />
+                                <x-text-input id="stok_display" class="block mt-1 w-full bg-gray-100" type="number" :value="old('stok', $barang->stok)" disabled />
+                                <p class="text-xs text-gray-500 mt-1">Jumlah barang yang tersedia (tidak dapat diubah langsung)</p>
+                                <input type="hidden" name="stok" value="{{ old('stok', $barang->stok) }}">
                             </div>
                             
                             <!-- Kondisi -->
@@ -110,7 +102,7 @@
                                 <x-input-label for="gambar" :value="__('Gambar')" />
                                 @if($barang->gambar)
                                     <div class="mb-2">
-                                        <img src="{{ asset('storage/' . $barang->gambar) }}" alt="{{ $barang->nama }}" class="h-24 w-auto object-contain">
+                                        <img src="{{ asset('storage/' . $barang->gambar) }}" alt="{{ $barang->nama_barang }}" class="h-24 w-auto object-contain">
                                         <p class="text-sm text-gray-500">Gambar saat ini</p>
                                     </div>
                                 @endif
