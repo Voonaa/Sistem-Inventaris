@@ -1,0 +1,310 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\Barang;
+use App\Models\Buku;
+use App\Models\Peminjaman;
+use App\Models\RiwayatBarang;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+
+class PeminjamanController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(Request $request)
+    {
+        $query = Peminjaman::with(['user', 'buku', 'barang']);
+        
+        // Filter by user
+        if ($request->has('user_id')) {
+            $query->where('user_id', $request->user_id);
+        }
+        
+        // Filter by status
+        if ($request->has('status')) {
+            $query->where('status', $request->status);
+        }
+        
+        // Filter by date range
+        if ($request->has('start_date') && $request->has('end_date')) {
+            $query->whereBetween('tanggal_pinjam', [$request->start_date, $request->end_date]);
+        }
+        
+        // Filter by search term
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->whereHas('user', function($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                })
+                ->orWhereHas('buku', function($q) use ($search) {
+                    $q->where('judul', 'like', "%{$search}%");
+                })
+                ->orWhereHas('barang', function($q) use ($search) {
+                    $q->where('nama_barang', 'like', "%{$search}%");
+                });
+            });
+        }
+        
+        $perPage = $request->input('per_page', 15);
+        $sortBy = $request->input('sort_by', 'created_at');
+        $sortDirection = $request->input('sort_direction', 'desc');
+        
+        return $query->orderBy($sortBy, $sortDirection)->paginate($perPage);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|exists:users,id',
+            'buku_id' => 'nullable|exists:bukus,id',
+            'barang_id' => 'nullable|exists:barangs,id',
+            'tanggal_pinjam' => 'required|date',
+            'tanggal_kembali' => 'required|date|after_or_equal:tanggal_pinjam',
+            'peminjam' => 'nullable|string|max:255',
+            'jenis' => 'nullable|string|max:50',
+            'kelas' => 'nullable|string|max:50',
+            'jumlah' => 'required|integer|min:1',
+            'catatan' => 'nullable|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+        
+        // Ensure either buku_id or barang_id is provided
+        if (!$request->buku_id && !$request->barang_id) {
+            return response()->json([
+                'message' => 'Either buku_id or barang_id must be provided'
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+        
+        try {
+            DB::beginTransaction();
+            
+            $peminjaman = new Peminjaman();
+            $peminjaman->user_id = $request->user_id;
+            $peminjaman->tanggal_pinjam = $request->tanggal_pinjam;
+            $peminjaman->tanggal_kembali = $request->tanggal_kembali;
+            $peminjaman->peminjam = $request->peminjam;
+            $peminjaman->jenis = $request->jenis;
+            $peminjaman->kelas = $request->kelas;
+            $peminjaman->jumlah = $request->jumlah;
+            $peminjaman->status = 'dipinjam';
+            $peminjaman->catatan = $request->catatan;
+            
+            // Handle book borrowing
+            if ($request->buku_id) {
+                $buku = Buku::findOrFail($request->buku_id);
+                
+                // Check if enough books are available
+                if ($buku->stok - $buku->dipinjam < $request->jumlah) {
+                    return response()->json([
+                        'message' => 'Not enough books available for borrowing'
+                    ], Response::HTTP_UNPROCESSABLE_ENTITY);
+                }
+                
+                $peminjaman->buku_id = $request->buku_id;
+                $buku->dipinjam += $request->jumlah;
+                $buku->save();
+                
+                // Create history record
+                RiwayatBarang::create([
+                    'buku_id' => $buku->id,
+                    'jenis_aktivitas' => 'peminjaman',
+                    'jumlah' => $request->jumlah,
+                    'stok_sebelum' => $buku->stok,
+                    'stok_sesudah' => $buku->stok,
+                    'keterangan' => 'Peminjaman buku',
+                    'user_id' => auth()->id(),
+                ]);
+            }
+            
+            // Handle item borrowing
+            if ($request->barang_id) {
+                $barang = Barang::findOrFail($request->barang_id);
+                
+                // Check stock
+                if ($barang->stok < $request->jumlah) {
+                    return response()->json([
+                        'message' => 'Insufficient stock',
+                        'available' => $barang->stok,
+                        'requested' => $request->jumlah
+                    ], 400);
+                }
+                
+                // Decrement stock
+                $barang->stok -= $request->jumlah;
+                $barang->status = $barang->stok > 0 ? 'tersedia' : 'dipinjam';
+                $barang->save();
+                
+                // Create history record
+                RiwayatBarang::create([
+                    'barang_id' => $barang->id,
+                    'jenis_aktivitas' => 'peminjaman',
+                    'jumlah' => $request->jumlah,
+                    'stok_sebelum' => $barang->stok,
+                    'stok_sesudah' => $barang->stok,
+                    'keterangan' => 'Peminjaman barang',
+                    'user_id' => auth()->id(),
+                ]);
+            }
+            
+            $peminjaman->save();
+            
+            DB::commit();
+            
+            return response()->json([
+                'message' => 'Peminjaman berhasil dibuat',
+                'data' => $peminjaman->load(['user', 'buku', 'barang'])
+            ], Response::HTTP_CREATED);
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'An error occurred while creating the loan',
+                'error' => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Peminjaman $peminjaman)
+    {
+        return response()->json($peminjaman->load(['user', 'buku', 'barang']));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Peminjaman $peminjaman)
+    {
+        $validator = Validator::make($request->all(), [
+            'status' => 'sometimes|required|in:dipinjam,dikembalikan,terlambat',
+            'tanggal_dikembalikan' => 'nullable|date|after_or_equal:tanggal_pinjam',
+            'denda' => 'nullable|numeric|min:0',
+            'catatan' => 'nullable|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+        
+        try {
+            DB::beginTransaction();
+            
+            // If status is being changed to "returned"
+            if ($request->status === 'dikembalikan' && $peminjaman->status !== 'dikembalikan') {
+                $peminjaman->tanggal_dikembalikan = $request->tanggal_dikembalikan ?? now();
+                
+                // Return book to inventory
+                if ($peminjaman->buku_id) {
+                    $buku = $peminjaman->buku;
+                    $buku->dipinjam -= $peminjaman->jumlah;
+                    $buku->save();
+                    
+                    // Create history record
+                    RiwayatBarang::create([
+                        'buku_id' => $buku->id,
+                        'jenis_aktivitas' => 'pengembalian',
+                        'jumlah' => $peminjaman->jumlah,
+                        'stok_sebelum' => $buku->stok,
+                        'stok_sesudah' => $buku->stok,
+                        'keterangan' => 'Pengembalian buku',
+                        'user_id' => auth()->id(),
+                    ]);
+                }
+                
+                // Return item to inventory
+                if ($peminjaman->barang_id) {
+                    $barang = $peminjaman->barang;
+                    $barang->stok += $peminjaman->jumlah;
+                    $barang->status = 'tersedia';
+                    $barang->save();
+                    
+                    // Create history record
+                    RiwayatBarang::create([
+                        'barang_id' => $barang->id,
+                        'jenis_aktivitas' => 'pengembalian',
+                        'jumlah' => $peminjaman->jumlah,
+                        'stok_sebelum' => $barang->stok,
+                        'stok_sesudah' => $barang->stok,
+                        'keterangan' => 'Pengembalian barang',
+                        'user_id' => auth()->id(),
+                    ]);
+                }
+            }
+            
+            if ($request->has('status')) {
+                $peminjaman->status = $request->status;
+            }
+            
+            if ($request->has('denda')) {
+                $peminjaman->denda = $request->denda;
+            }
+            
+            if ($request->has('catatan')) {
+                $peminjaman->catatan = $request->catatan;
+            }
+            
+            $peminjaman->save();
+            
+            DB::commit();
+            
+            return response()->json([
+                'message' => 'Peminjaman berhasil diperbarui',
+                'data' => $peminjaman->load(['user', 'buku', 'barang'])
+            ]);
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'An error occurred while updating the loan',
+                'error' => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Peminjaman $peminjaman)
+    {
+        // Only allow deletion if status is 'dikembalikan'
+        if ($peminjaman->status !== 'dikembalikan') {
+            return response()->json([
+                'message' => 'Cannot delete an active loan. Return the item first.'
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+        
+        $peminjaman->delete();
+        
+        return response()->json([
+            'message' => 'Peminjaman berhasil dihapus'
+        ]);
+    }
+    
+    /**
+     * Get overdue loans
+     */
+    public function getOverdue()
+    {
+        $overdueLoans = Peminjaman::with(['user', 'buku', 'barang'])
+            ->where('status', 'dipinjam')
+            ->where('tanggal_kembali', '<', now())
+            ->get();
+            
+        return response()->json($overdueLoans);
+    }
+} 
