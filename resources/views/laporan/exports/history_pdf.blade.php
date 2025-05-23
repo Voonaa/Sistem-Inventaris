@@ -104,10 +104,10 @@
                 <th width="5%">No</th>
                 <th width="15%">Waktu</th>
                 <th width="15%">Petugas</th>
-                <th width="20%">Barang</th>
-                <th width="10%">Jenis</th>
+                <th width="25%">Barang</th>
+                <th width="15%">Jenis</th>
                 <th width="10%">Jumlah</th>
-                <th width="25%">Catatan</th>
+                <th width="15%">Catatan</th>
             </tr>
         </thead>
         <tbody>

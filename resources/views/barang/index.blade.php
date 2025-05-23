@@ -55,7 +55,7 @@
                         <a href="{{ route('barang.create') }}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
                             Tambah Barang
                         </a>
-                        <a href="{{ route('barang.manage') }}" class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded">
+                        <a href="{{ route('barang.manage') }}" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
                             Hapus Barang
                         </a>
                     </div>
@@ -77,21 +77,57 @@
                 <div class="bg-gray-50 rounded-lg p-4 mb-6">
                     <h3 class="text-md font-medium text-gray-700 mb-3">Informasi Ringkas</h3>
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div class="bg-white p-3 rounded-md shadow-sm border border-gray-200">
-                            <div class="text-sm text-gray-500">Total Barang</div>
-                            <div class="text-xl font-semibold">{{ $barangs->total() }}</div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 bg-blue-100 rounded-full p-3">
+                                    <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-500">Total Barang</div>
+                                    <div class="text-xl font-semibold text-gray-900">{{ $barangs->total() }}</div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="bg-white p-3 rounded-md shadow-sm border border-gray-200">
-                            <div class="text-sm text-gray-500">Total Stok</div>
-                            <div class="text-xl font-semibold">{{ $barangs->sum('stok') }} / {{ $barangs->sum('jumlah') }}</div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 bg-green-100 rounded-full p-3">
+                                    <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-500">Kondisi Baik</div>
+                                    <div class="text-xl font-semibold text-gray-900">{{ $barangs->where('kondisi', 'baik')->count() }}</div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="bg-white p-3 rounded-md shadow-sm border border-gray-200">
-                            <div class="text-sm text-gray-500">Kondisi Baik</div>
-                            <div class="text-xl font-semibold">{{ $barangs->where('kondisi', 'Baik')->count() }}</div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 bg-red-100 rounded-full p-3">
+                                    <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-500">Kondisi Rusak</div>
+                                    <div class="text-xl font-semibold text-gray-900">{{ $barangs->where('kondisi', 'rusak')->count() }}</div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="bg-white p-3 rounded-md shadow-sm border border-gray-200">
-                            <div class="text-sm text-gray-500">Stok Tersedia</div>
-                            <div class="text-xl font-semibold">{{ round(($barangs->sum('stok') / max(1, $barangs->sum('jumlah'))) * 100) }}%</div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 bg-yellow-100 rounded-full p-3">
+                                    <svg class="h-6 w-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-500">Sedang Dipinjam</div>
+                                    <div class="text-xl font-semibold text-gray-900">{{ $barangs->filter(function($barang) { return $barang->stok < $barang->jumlah; })->count() }}</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -120,7 +156,7 @@
                                 <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Nama Barang</th>
                                 <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Kategori</th>
                                 <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Sub Kategori</th>
-                                <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Stok</th>
+                                <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Jumlah</th>
                                 <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Kondisi</th>
                                 <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Aksi</th>
                             </tr>
@@ -161,17 +197,17 @@
                                         @endif
                                     </td>
                                     <td class="px-4 py-2 border-b border-gray-200">
-                                        {{ $barang->stok }} / {{ $barang->jumlah }}
+                                        {{ $barang->stok }} {{ $barang->jumlah }}
                                     </td>
                                     <td class="px-4 py-2 border-b border-gray-200">
-                                        @if($barang->kondisi == 'Baik')
+                                        @if($barang->kondisi == 'baik')
                                             <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Baik</span>
-                                        @elseif($barang->kondisi == 'Kurang Baik')
+                                        @elseif($barang->kondisi == 'kurang_baik')
                                             <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">Kurang Baik</span>
-                                        @elseif($barang->kondisi == 'Rusak')
+                                        @elseif($barang->kondisi == 'rusak')
                                             <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">Rusak</span>
                                         @else
-                                            <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">{{ $barang->kondisi }}</span>
+                                            <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">{{ ucfirst(str_replace('_', ' ', $barang->kondisi)) }}</span>
                                         @endif
                                     </td>
                                     <td class="px-4 py-2 border-b border-gray-200">

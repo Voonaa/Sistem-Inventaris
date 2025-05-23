@@ -72,8 +72,8 @@
                     <div style="font-size: 16px; font-weight: bold;">{{ count($barangs) }}</div>
                 </td>
                 <td style="width: 33%; padding: 8px; background-color: white; border: 1px solid #ddd; border-radius: 3px;">
-                    <div style="font-size: 11px; color: #666;">Total Stok</div>
-                    <div style="font-size: 16px; font-weight: bold;">{{ $barangs->sum('stok') }} / {{ $barangs->sum('jumlah') }}</div>
+                    <div style="font-size: 11px; color: #666;">Total Jumlah</div>
+                    <div style="font-size: 16px; font-weight: bold;">{{ $barangs->sum('stok') }}</div>
                 </td>
                 <td style="width: 33%; padding: 8px; background-color: white; border: 1px solid #ddd; border-radius: 3px;">
                     <div style="font-size: 11px; color: #666;">Kategori</div>
@@ -89,12 +89,12 @@
         <thead>
             <tr>
                 <th width="5%">No</th>
-                <th width="10%">Kode</th>
-                <th width="25%">Nama Barang</th>
-                <th width="15%">Kategori</th>
+                <th width="15%">Kode</th>
+                <th width="30%">Nama Barang</th>
+                <th width="20%">Kategori</th>
                 <th width="15%">Sub Kategori</th>
-                <th width="10%">Stok</th>
-                <th width="10%">Kondisi</th>
+                <th width="15%">Jumlah</th>
+                <th width="15%">Kondisi</th>
             </tr>
         </thead>
         <tbody>
@@ -105,7 +105,7 @@
                     <td>{{ $item->nama_barang }}</td>
                     <td>{{ $item->kategori_label }}</td>
                     <td>{{ $item->sub_kategori_label ?? '-' }}</td>
-                    <td>{{ $item->stok }} / {{ $item->jumlah }}</td>
+                    <td>{{ $item->stok }}</td>
                     <td>{{ $item->kondisi }}</td>
                 </tr>
             @empty

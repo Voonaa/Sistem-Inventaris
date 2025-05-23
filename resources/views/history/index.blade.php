@@ -59,21 +59,57 @@
                     <div class="bg-gray-50 rounded-lg p-4 mb-6">
                         <h3 class="text-md font-medium text-gray-700 mb-3">Informasi Ringkas</h3>
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <div class="bg-white p-3 rounded-md shadow-sm border border-gray-200">
-                                <div class="text-sm text-gray-500">Total Aktivitas</div>
-                                <div class="text-xl font-semibold">{{ count($histories) }}</div>
+                            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 bg-blue-100 rounded-full p-3">
+                                        <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-500">Total Aktivitas</div>
+                                        <div class="text-xl font-semibold text-gray-900">{{ count($histories) }}</div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="bg-white p-3 rounded-md shadow-sm border border-gray-200">
-                                <div class="text-sm text-gray-500">Barang Masuk</div>
-                                <div class="text-xl font-semibold">{{ $histories->where('jenis_aktivitas', 'masuk')->count() }}</div>
+                            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 bg-green-100 rounded-full p-3">
+                                        <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-500">Barang Masuk</div>
+                                        <div class="text-xl font-semibold text-gray-900">{{ $histories->where('jenis_aktivitas', 'masuk')->count() }}</div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="bg-white p-3 rounded-md shadow-sm border border-gray-200">
-                                <div class="text-sm text-gray-500">Barang Keluar</div>
-                                <div class="text-xl font-semibold">{{ $histories->where('jenis_aktivitas', 'keluar')->count() }}</div>
+                            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 bg-red-100 rounded-full p-3">
+                                        <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4m8-8v16"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-500">Barang Keluar</div>
+                                        <div class="text-xl font-semibold text-gray-900">{{ $histories->where('jenis_aktivitas', 'keluar')->count() }}</div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="bg-white p-3 rounded-md shadow-sm border border-gray-200">
-                                <div class="text-sm text-gray-500">Perubahan</div>
-                                <div class="text-xl font-semibold">{{ $histories->whereNotIn('jenis_aktivitas', ['masuk', 'keluar'])->count() }}</div>
+                            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 bg-yellow-100 rounded-full p-3">
+                                        <svg class="h-6 w-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-500">Perubahan</div>
+                                        <div class="text-xl font-semibold text-gray-900">{{ $histories->whereNotIn('jenis_aktivitas', ['masuk', 'keluar'])->count() }}</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -112,8 +148,12 @@
                                                     Peminjaman
                                                 </span>
                                             @elseif($item->jenis_aktivitas == 'pengembalian')
-                                                <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
+                                                <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
                                                     Pengembalian
+                                                </span>
+                                            @elseif($item->jenis_aktivitas == 'perbaikan')
+                                                <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
+                                                    Perbaikan
                                                 </span>
                                             @else
                                                 <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">

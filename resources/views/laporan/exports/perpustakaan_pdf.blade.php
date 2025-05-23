@@ -99,9 +99,9 @@
             <tr>
                 <th width="5%">No</th>
                 <th width="15%">Kode</th>
-                <th width="25%">Nama Barang</th>
-                <th width="15%">Sub Kategori</th>
-                <th width="10%">Stok</th>
+                <th width="35%">Nama Barang</th>
+                <th width="20%">Sub Kategori</th>
+                <th width="10%">Jumlah</th>
                 <th width="15%">Kondisi</th>
             </tr>
         </thead>
@@ -112,7 +112,7 @@
                     <td>{{ $item->kode_barang }}</td>
                     <td>{{ $item->nama_barang }}</td>
                     <td>{{ $item->sub_kategori ?? '-' }}</td>
-                    <td>{{ $item->stok }} / {{ $item->jumlah }}</td>
+                    <td>{{ $item->stok }}</td>
                     <td>{{ $item->kondisi }}</td>
                 </tr>
             @empty

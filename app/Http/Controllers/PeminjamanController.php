@@ -67,7 +67,7 @@ class PeminjamanController extends Controller
      */
     public function create()
     {
-        $barangs = Barang::where('stok', '>', 0)
+        $barangs = Barang::where('jumlah', '>', 0)
             ->orderBy('nama_barang', 'asc')
             ->get();
         
@@ -92,10 +92,10 @@ class PeminjamanController extends Controller
         // Check if there's enough stock
         $barang = Barang::findOrFail($validated['barang_id']);
         
-        if ($barang->stok < $validated['jumlah']) {
+        if ($barang->jumlah < $validated['jumlah']) {
             return back()
                 ->withInput()
-                ->with('error', 'Stok barang tidak mencukupi. Tersedia: ' . $barang->stok);
+                ->with('error', 'Jumlah barang tidak mencukupi. Tersedia: ' . $barang->jumlah);
         }
 
         try {
@@ -118,22 +118,23 @@ class PeminjamanController extends Controller
             }
 
             // Update stock on the item
-            $stokSebelum = $barang->stok;
-            $stokSesudah = $stokSebelum - $validated['jumlah'];
+            $jumlahSebelum = $barang->jumlah;
+            $barang->jumlah -= $validated['jumlah'];
             
-            $barang->stok = $stokSesudah;
-            if (!$barang->save()) {
-                throw new \Exception('Gagal mengupdate stok barang');
+            if ($barang->jumlah == 0) {
+                $barang->status = 'dipinjam';
             }
+            
+            $barang->save();
 
             // Log to RiwayatBarang
             $riwayat = new RiwayatBarang([
                 'barang_id' => $barang->id,
-                'jenis_aktivitas' => 'peminjaman',
+                'jenis_aktivitas' => 'pinjam',
                 'jumlah' => $validated['jumlah'],
-                'stok_sebelum' => $stokSebelum,
-                'stok_sesudah' => $stokSesudah,
-                'keterangan' => 'Dipinjam oleh ' . $validated['peminjam'] . ' (' . $validated['jenis'] . ' - ' . $validated['kelas'] . ')',
+                'jumlah_sebelum' => $jumlahSebelum,
+                'jumlah_sesudah' => $barang->jumlah,
+                'keterangan' => 'Peminjaman oleh ' . $validated['peminjam'] . ' (' . $validated['jenis'] . ' - ' . $validated['kelas'] . ')',
                 'user_id' => Auth::id(),
             ]);
             
@@ -174,11 +175,7 @@ class PeminjamanController extends Controller
      */
     public function edit(Peminjaman $peminjaman)
     {
-        $barangs = Barang::where('stok', '>', 0)
-            ->orWhere('id', $peminjaman->barang_id) // Include currently assigned item
-            ->orderBy('nama_barang', 'asc')
-            ->get();
-            
+        $barangs = Barang::orderBy('nama_barang', 'asc')->get();
         return view('peminjaman.edit', compact('peminjaman', 'barangs'));
     }
 
@@ -195,7 +192,6 @@ class PeminjamanController extends Controller
             'jumlah' => 'required|integer|min:1',
             'tanggal_pinjam' => 'required|date',
             'tanggal_kembali' => 'required|date|after_or_equal:tanggal_pinjam',
-            'status' => 'required|in:dipinjam,dikembalikan',
         ]);
 
         try {
@@ -205,65 +201,61 @@ class PeminjamanController extends Controller
             $oldJumlah = $peminjaman->jumlah;
             $oldStatus = $peminjaman->status;
             
-            // If returning item or changing item/quantity, adjust inventory
-            if (($oldStatus === 'dipinjam' && $validated['status'] === 'dikembalikan') || 
-                $oldBarangId !== $validated['barang_id'] ||
-                $oldJumlah !== $validated['jumlah']) {
+            // If changing quantity or barang, check stock availability
+            if ($validated['barang_id'] != $oldBarangId || $validated['jumlah'] != $oldJumlah) {
+                $barang = Barang::findOrFail($validated['barang_id']);
+                $availableStock = $barang->jumlah;
+                if ($validated['barang_id'] == $oldBarangId) {
+                    $availableStock += $oldJumlah;
+                }
                 
-                // If returning or changing barang, return stock to the old barang
-                if ($oldStatus === 'dipinjam' && ($validated['status'] === 'dikembalikan' || $oldBarangId !== $validated['barang_id'])) {
+                if ($availableStock < $validated['jumlah']) {
+                    DB::rollBack();
+                    return back()->withInput()->with('error', 'Jumlah barang tidak mencukupi. Tersedia: ' . $availableStock);
+                }
+                
+                // If changing barang, restore old barang's stock
+                if ($validated['barang_id'] != $oldBarangId) {
                     $oldBarang = Barang::findOrFail($oldBarangId);
-                    $oldStokBefore = $oldBarang->stok;
-                    $oldBarang->stok += $oldJumlah;
+                    $oldBarang->jumlah += $oldJumlah;
+                    if ($oldBarang->jumlah > 0) {
+                        $oldBarang->status = 'tersedia';
+                    }
                     $oldBarang->save();
                     
-                    // Log return to the old item
+                    // Create history for old barang
                     RiwayatBarang::create([
-                        'barang_id' => $oldBarangId,
-                        'jenis_aktivitas' => 'pengembalian',
+                        'barang_id' => $oldBarang->id,
+                        'jenis_aktivitas' => 'kembali',
                         'jumlah' => $oldJumlah,
-                        'stok_sebelum' => $oldStokBefore,
-                        'stok_sesudah' => $oldBarang->stok,
-                        'keterangan' => 'Dikembalikan oleh ' . $validated['peminjam'] . ' (' . $validated['jenis'] . ' - ' . $validated['kelas'] . ')',
+                        'jumlah_sebelum' => $oldBarang->jumlah - $oldJumlah,
+                        'jumlah_sesudah' => $oldBarang->jumlah,
+                        'keterangan' => 'Pengembalian dari peminjaman (perubahan barang)',
                         'user_id' => Auth::id(),
                     ]);
                 }
                 
-                // If status is still 'dipinjam' and changing item or borrowing new item
-                if ($validated['status'] === 'dipinjam') {
-                    // If changing item or changing quantity, adjust inventory for the new item
-                    if ($oldBarangId !== $validated['barang_id'] || $oldJumlah !== $validated['jumlah']) {
-                        $newBarang = Barang::findOrFail($validated['barang_id']);
-                        
-                        // Make sure there's enough stock
-                        if ($newBarang->stok < $validated['jumlah']) {
-                            DB::rollBack();
-                            return back()->withInput()->with('error', 'Stok barang tidak mencukupi. Tersedia: ' . $newBarang->stok);
-                        }
-                        
-                        $newStokBefore = $newBarang->stok;
-                        $newBarang->stok -= $validated['jumlah'];
-                        $newBarang->save();
-                        
-                        // Log borrowing for the new item
-                        RiwayatBarang::create([
-                            'barang_id' => $validated['barang_id'],
-                            'jenis_aktivitas' => 'peminjaman',
-                            'jumlah' => $validated['jumlah'],
-                            'stok_sebelum' => $newStokBefore,
-                            'stok_sesudah' => $newBarang->stok,
-                            'keterangan' => 'Dipinjam oleh ' . $validated['peminjam'] . ' (' . $validated['jenis'] . ' - ' . $validated['kelas'] . ')',
-                            'user_id' => Auth::id(),
-                        ]);
-                    }
+                // Update new barang's stock
+                $jumlahSebelum = $barang->jumlah;
+                $barang->jumlah -= $validated['jumlah'];
+                if ($barang->jumlah == 0) {
+                    $barang->status = 'dipinjam';
                 }
+                $barang->save();
+                
+                // Create history for new barang
+                RiwayatBarang::create([
+                    'barang_id' => $barang->id,
+                    'jenis_aktivitas' => 'pinjam',
+                    'jumlah' => $validated['jumlah'],
+                    'jumlah_sebelum' => $jumlahSebelum,
+                    'jumlah_sesudah' => $barang->jumlah,
+                    'keterangan' => 'Peminjaman oleh ' . $validated['peminjam'] . ' (' . $validated['jenis'] . ' - ' . $validated['kelas'] . ')',
+                    'user_id' => Auth::id(),
+                ]);
             }
             
             // Update peminjaman record
-            if ($validated['status'] === 'dikembalikan' && !$peminjaman->tanggal_dikembalikan) {
-                $validated['tanggal_dikembalikan'] = now();
-            }
-            
             $peminjaman->update($validated);
             
             DB::commit();
@@ -290,10 +282,13 @@ class PeminjamanController extends Controller
             
             // Update barang stock
             $barang = $peminjaman->barang;
-            $stokSebelum = $barang->stok;
-            $stokSesudah = $stokSebelum + $peminjaman->jumlah;
+            $jumlahSebelum = $barang->jumlah;
+            $barang->jumlah += $peminjaman->jumlah;
             
-            $barang->stok = $stokSesudah;
+            if ($barang->jumlah > 0) {
+                $barang->status = 'tersedia';
+            }
+            
             $barang->save();
             
             // Update peminjaman record
@@ -304,10 +299,10 @@ class PeminjamanController extends Controller
             // Log to RiwayatBarang
             RiwayatBarang::create([
                 'barang_id' => $barang->id,
-                'jenis_aktivitas' => 'pengembalian',
+                'jenis_aktivitas' => 'kembali',
                 'jumlah' => $peminjaman->jumlah,
-                'stok_sebelum' => $stokSebelum,
-                'stok_sesudah' => $stokSesudah,
+                'jumlah_sebelum' => $jumlahSebelum,
+                'jumlah_sesudah' => $barang->jumlah,
                 'keterangan' => 'Dikembalikan oleh ' . $peminjaman->peminjam . ' (' . $peminjaman->jenis . ' - ' . $peminjaman->kelas . ')',
                 'user_id' => Auth::id(),
             ]);
@@ -334,20 +329,23 @@ class PeminjamanController extends Controller
             if ($peminjaman->status === 'dipinjam' && !$peminjaman->tanggal_dikembalikan) {
                 $barang = $peminjaman->barang;
                 if ($barang) {
-                    $stokSebelum = $barang->stok;
-                    $stokSesudah = $stokSebelum + $peminjaman->jumlah;
+                    $jumlahSebelum = $barang->jumlah;
+                    $barang->jumlah += $peminjaman->jumlah;
                     
-                    $barang->stok = $stokSesudah;
+                    if ($barang->jumlah > 0) {
+                        $barang->status = 'tersedia';
+                    }
+                    
                     $barang->save();
                     
                     // Log to RiwayatBarang
                     RiwayatBarang::create([
                         'barang_id' => $barang->id,
-                        'jenis_aktivitas' => 'penyesuaian',
+                        'jenis_aktivitas' => 'kembali',
                         'jumlah' => $peminjaman->jumlah,
-                        'stok_sebelum' => $stokSebelum,
-                        'stok_sesudah' => $stokSesudah,
-                        'keterangan' => 'Pembatalan peminjaman: ' . $peminjaman->peminjam . ' (' . $peminjaman->jenis . ' - ' . $peminjaman->kelas . ')',
+                        'jumlah_sebelum' => $jumlahSebelum,
+                        'jumlah_sesudah' => $barang->jumlah,
+                        'keterangan' => 'Pengembalian dari peminjaman yang dihapus',
                         'user_id' => Auth::id(),
                     ]);
                 }

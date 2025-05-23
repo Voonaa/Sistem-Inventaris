@@ -1,7 +1,11 @@
 <div class="flex flex-col flex-grow pt-5 pb-4 overflow-y-auto">
     <!-- Logo -->
-    <div class="flex items-center justify-center flex-shrink-0 px-4">
-        <h1 class="text-xl font-bold text-blue-600">Inventaris SMK</h1>
+    <div class="flex flex-col items-center justify-center flex-shrink-0 px-4 space-y-3">
+        <img src="{{ asset('assets/images/logosmk.png') }}" alt="SMK Sasmita Logo" class="h-24 w-auto">
+        <div class="text-center">
+            <div class="text-xl font-bold text-blue-600">SMK</div>
+            <div class="text-lg font-semibold text-gray-800">SASMITA</div>
+        </div>
     </div>
     
     <!-- Navigation Links -->

@@ -60,12 +60,12 @@
                             </div>
                             
                             <div>
-                                <dt class="text-sm font-medium text-gray-500">Stok Sebelum</dt>
+                                <dt class="text-sm font-medium text-gray-500">Jumlah Sebelum</dt>
                                 <dd class="mt-1 text-sm text-gray-900">{{ $riwayatBarang->stok_sebelum }}</dd>
                             </div>
                             
                             <div>
-                                <dt class="text-sm font-medium text-gray-500">Stok Sesudah</dt>
+                                <dt class="text-sm font-medium text-gray-500">Jumlah Sesudah</dt>
                                 <dd class="mt-1 text-sm text-gray-900">{{ $riwayatBarang->stok_sesudah }}</dd>
                             </div>
                             
@@ -99,7 +99,7 @@
                             </div>
                             
                             <div>
-                                <dt class="text-sm font-medium text-gray-500">Stok Saat Ini</dt>
+                                <dt class="text-sm font-medium text-gray-500">Jumlah Saat Ini</dt>
                                 <dd class="mt-1 text-sm text-gray-900">{{ $riwayatBarang->barang->stok }} / {{ $riwayatBarang->barang->jumlah }}</dd>
                             </div>
                             

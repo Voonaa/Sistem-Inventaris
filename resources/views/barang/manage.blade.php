@@ -76,8 +76,8 @@
                             <div class="text-xl font-semibold">{{ $barangs->where('kondisi', 'Rusak')->count() }}</div>
                         </div>
                         <div class="bg-white p-3 rounded-md shadow-sm border border-gray-200">
-                            <div class="text-sm text-gray-500">Total Stok</div>
-                            <div class="text-xl font-semibold">{{ $barangs->sum('stok') }} / {{ $barangs->sum('jumlah') }}</div>
+                            <div class="text-sm text-gray-500">Total Jumlah</div>
+                            <div class="text-xl font-semibold">{{ $barangs->sum('stok') }} {{ $barangs->sum('jumlah') }}</div>
                         </div>
                     </div>
                 </div>
@@ -111,7 +111,7 @@
                                 <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Kode</th>
                                 <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Nama Barang</th>
                                 <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Kategori</th>
-                                <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Stok</th>
+                                <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Jumlah</th>
                                 <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Kondisi</th>
                                 <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Aksi</th>
                             </tr>
@@ -132,17 +132,17 @@
                                         @endif
                                     </td>
                                     <td class="px-4 py-2 border-b border-gray-200">
-                                        {{ $barang->stok }} / {{ $barang->jumlah }}
+                                        {{ $barang->stok }} {{ $barang->jumlah }}
                                     </td>
                                     <td class="px-4 py-2 border-b border-gray-200">
-                                        @if($barang->kondisi == 'Baik')
+                                        @if($barang->kondisi == 'baik')
                                             <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Baik</span>
-                                        @elseif($barang->kondisi == 'Kurang Baik')
+                                        @elseif($barang->kondisi == 'kurang_baik')
                                             <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">Kurang Baik</span>
-                                        @elseif($barang->kondisi == 'Rusak')
+                                        @elseif($barang->kondisi == 'rusak')
                                             <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">Rusak</span>
                                         @else
-                                            <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">{{ $barang->kondisi }}</span>
+                                            <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">{{ ucfirst(str_replace('_', ' ', $barang->kondisi)) }}</span>
                                         @endif
                                     </td>
                                     <td class="px-4 py-2 border-b border-gray-200">

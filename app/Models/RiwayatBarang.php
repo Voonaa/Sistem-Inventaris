@@ -20,8 +20,8 @@ class RiwayatBarang extends Model
         'barang_id',
         'jenis_aktivitas',
         'jumlah',
-        'stok_sebelum',
-        'stok_sesudah',
+        'jumlah_sebelum',
+        'jumlah_sesudah',
         'keterangan',
         'user_id',
     ];
@@ -33,8 +33,8 @@ class RiwayatBarang extends Model
      */
     protected $casts = [
         'jumlah' => 'integer',
-        'stok_sebelum' => 'integer',
-        'stok_sesudah' => 'integer',
+        'jumlah_sebelum' => 'integer',
+        'jumlah_sesudah' => 'integer',
     ];
     
     /**

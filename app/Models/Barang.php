@@ -26,7 +26,7 @@ class Barang extends Model
         'kondisi',
         'status',
         'lokasi',
-        'stok',
+        'jumlah',
         'harga_perolehan',
         'sumber_dana',
         'foto'
@@ -38,7 +38,7 @@ class Barang extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'stok' => 'integer',
+        'jumlah' => 'integer',
         'harga_perolehan' => 'decimal:2'
     ];
     

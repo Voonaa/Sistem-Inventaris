@@ -103,13 +103,12 @@
             <tr>
                 <th width="5%">No</th>
                 <th width="10%">Kode</th>
-                <th width="20%">Barang</th>
+                <th width="25%">Barang</th>
                 <th width="10%">Jenis</th>
                 <th width="10%">Jumlah</th>
-                <th width="10%">Stok Sebelum</th>
-                <th width="10%">Stok Sesudah</th>
-                <th width="10%">Petugas</th>
-                <th width="15%">Tanggal</th>
+                <th width="15%">Jumlah Sebelum</th>
+                <th width="15%">Jumlah Sesudah</th>
+                <th width="10%">Tanggal</th>
             </tr>
         </thead>
         <tbody>
@@ -122,12 +121,11 @@
                     <td>{{ $item->jumlah }}</td>
                     <td>{{ $item->stok_sebelum }}</td>
                     <td>{{ $item->stok_sesudah }}</td>
-                    <td>{{ $item->user->name ?? 'N/A' }}</td>
-                    <td>{{ date('d-m-Y H:i', strtotime($item->created_at)) }}</td>
+                    <td>{{ date('d-m-Y', strtotime($item->created_at)) }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="9" style="text-align: center;">Tidak ada data pergerakan barang</td>
+                    <td colspan="8" style="text-align: center;">Tidak ada data pergerakan barang</td>
                 </tr>
             @endforelse
         </tbody>

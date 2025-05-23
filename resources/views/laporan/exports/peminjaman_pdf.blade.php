@@ -99,8 +99,8 @@
             <tr>
                 <th width="5%">No</th>
                 <th width="10%">Kode</th>
-                <th width="20%">Peminjam</th>
-                <th width="20%">Barang</th>
+                <th width="25%">Peminjam</th>
+                <th width="25%">Barang</th>
                 <th width="15%">Tanggal Pinjam</th>
                 <th width="15%">Tanggal Kembali</th>
                 <th width="10%">Status</th>

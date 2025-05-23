@@ -44,14 +44,14 @@
                                     <div class="mb-4">
                                         <p class="text-sm text-gray-600">Kondisi</p>
                                         <div>
-                                            @if($barang->kondisi == 'Baik')
+                                            @if($barang->kondisi == 'baik')
                                                 <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Baik</span>
-                                            @elseif($barang->kondisi == 'Kurang Baik')
+                                            @elseif($barang->kondisi == 'kurang_baik')
                                                 <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">Kurang Baik</span>
-                                            @elseif($barang->kondisi == 'Rusak')
+                                            @elseif($barang->kondisi == 'rusak')
                                                 <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">Rusak</span>
                                             @else
-                                                <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">{{ $barang->kondisi }}</span>
+                                                <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">{{ ucfirst(str_replace('_', ' ', $barang->kondisi)) }}</span>
                                             @endif
                                         </div>
                                     </div>
@@ -64,7 +64,7 @@
                                     </div>
                                     
                                     <div class="mb-4">
-                                        <p class="text-sm text-gray-600">Stok</p>
+                                        <p class="text-sm text-gray-600">Jumlah</p>
                                         <p class="font-semibold">{{ $barang->stok }}</p>
                                     </div>
                                     
@@ -93,10 +93,10 @@
                         </div>
                         
                         <div>
-                            @if($barang->gambar)
+                            @if($barang->foto)
                             <div class="mb-4">
                                 <p class="text-sm text-gray-600 mb-2">Gambar</p>
-                                <img src="{{ asset('storage/' . $barang->gambar) }}" alt="{{ $barang->nama_barang }}" class="w-full rounded-lg">
+                                <img src="{{ asset('storage/' . $barang->foto) }}" alt="{{ $barang->nama_barang }}" class="w-full rounded-lg">
                             </div>
                             @endif
                             

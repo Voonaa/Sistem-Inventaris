@@ -41,25 +41,17 @@ class BarangController extends Controller
         $this->checkRole();
 
         $query = Barang::query();
-        $activeKategori = $request->kategori;
-        $activeSub = $request->sub;
 
-        // Apply kategori filter if provided
-        if ($activeKategori) {
-            $query->where('kategori', $activeKategori);
-
-            // Apply sub-kategori filter if provided and kategori is perpustakaan
-            if ($activeKategori === 'perpustakaan' && $activeSub) {
-                $query->where('sub_kategori', $activeSub);
+        // Filter by kategori if provided
+        if ($request->has('kategori')) {
+            $query->where('kategori', $request->kategori);
+            if ($request->has('sub')) {
+                $query->where('sub_kategori', $request->sub);
             }
         }
-        
-        $barangs = $query->orderBy('nama_barang', 'asc')->paginate(10);
 
-        // Get the categories from config
-        $categories = config('categories');
-            
-        return view('barang.index', compact('barangs', 'categories', 'activeKategori', 'activeSub'));
+        $barangs = $query->orderBy('created_at', 'desc')->paginate(10);
+        return view('barang.index', compact('barangs'));
     }
 
     /**
@@ -108,44 +100,45 @@ class BarangController extends Controller
     {
         $this->checkRole();
         
+        \Log::info('Storing new barang', [
+            'has_file' => $request->hasFile('gambar'),
+            'all_data' => $request->all()
+        ]);
+        
         $validated = $request->validate([
             'kode_barang' => 'required|string|max:50|unique:barangs,kode_barang',
             'nama_barang' => 'required|string|max:255',
             'kategori' => 'required|string',
             'sub_kategori' => 'nullable|string|required_if:kategori,perpustakaan',
-            'kondisi' => 'required|string|in:Baik,Kurang Baik,Rusak',
+            'kondisi' => 'required|string|in:baik,kurang_baik,rusak',
             'jumlah' => 'required|integer|min:1',
             'deskripsi' => 'nullable|string',
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
         
-        // Set stok equal to jumlah initially
-        $validated['stok'] = $validated['jumlah'];
-        
         if ($request->hasFile('gambar')) {
             $path = $request->file('gambar')->store('barang', 'public');
-            $validated['gambar'] = $path;
+            $validated['foto'] = $path;
+            \Log::info('Image stored', ['path' => $path]);
         }
         
         $validated['created_by'] = Auth::id();
         
         $barang = Barang::create($validated);
+        \Log::info('Barang created', ['barang' => $barang->toArray()]);
         
-        // Create history entry for item addition
-        RiwayatBarang::create([
-            'barang_id' => $barang->id,
-            'jenis_aktivitas' => 'tambah',
-            'jumlah' => $validated['jumlah'],
-            'stok_sebelum' => 0,
-            'stok_sesudah' => $validated['jumlah'],
-            'keterangan' => 'Penambahan barang baru',
-            'user_id' => Auth::id(),
-        ]);
+        // Catat riwayat penambahan barang
+        RiwayatBarangController::tambahRiwayat(
+            $barang->id,
+            'tambah',
+            $validated['jumlah'],
+            'Penambahan barang baru'
+        );
         
         // Check if request is from manage page
         if ($request->has('from_manage')) {
             return redirect()->route('barang.manage')
-                ->with('success', 'Barang berhasil ditambahkan.');
+                    ->with('success', 'Barang berhasil ditambahkan.');
         }
         
         return redirect()->route('barang.index')
@@ -194,39 +187,37 @@ class BarangController extends Controller
             'nama_barang' => 'required|string|max:255',
             'kategori' => 'required|string',
             'sub_kategori' => 'nullable|string|required_if:kategori,perpustakaan',
-            'kondisi' => 'required|string|in:Baik,Kurang Baik,Rusak',
+            'kondisi' => 'required|string|in:baik,kurang_baik,rusak',
             'jumlah' => 'required|integer|min:1',
             'stok' => 'required|integer|min:0',
             'deskripsi' => 'nullable|string',
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
         
-        // Calculate the difference in jumlah
-        $originalJumlah = $barang->jumlah;
-        $newJumlah = $validated['jumlah'];
-        $jumlahDiff = $newJumlah - $originalJumlah;
-        
-        // If jumlah increased, also increase stok proportionally
-        if ($jumlahDiff > 0) {
-            $validated['stok'] = $barang->stok + $jumlahDiff;
-        } elseif ($jumlahDiff < 0 && abs($jumlahDiff) > ($originalJumlah - $barang->stok)) {
-            // If decreasing jumlah would make stok > jumlah, adjust stok 
-            $validated['stok'] = max(0, $newJumlah - ($originalJumlah - $barang->stok));
-        }
-        
         if ($request->hasFile('gambar')) {
             // Delete old image if it exists
-            if ($barang->gambar) {
-                Storage::disk('public')->delete($barang->gambar);
+            if ($barang->foto) {
+                Storage::disk('public')->delete($barang->foto);
             }
             
             $path = $request->file('gambar')->store('barang', 'public');
-            $validated['gambar'] = $path;
+            $validated['foto'] = $path;
         }
         
-        $validated['updated_by'] = Auth::id();
+        // Calculate the difference in jumlah
+        $jumlahDiff = $validated['jumlah'] - $barang->jumlah;
         
         $barang->update($validated);
+        
+        // Catat riwayat perubahan jumlah
+        if ($jumlahDiff != 0) {
+            RiwayatBarangController::tambahRiwayat(
+                $barang->id,
+                $jumlahDiff > 0 ? 'tambah' : 'kurang',
+                abs($jumlahDiff),
+                'Perubahan jumlah barang'
+            );
+        }
         
         return redirect()->route('barang.index')
                 ->with('success', 'Barang berhasil diperbarui.');
@@ -239,20 +230,17 @@ class BarangController extends Controller
     {
         $this->checkRole();
         
-        // Log the deletion first
-        RiwayatBarang::create([
-            'barang_id' => $barang->id,
-            'jenis_aktivitas' => 'hapus',
-            'jumlah' => $barang->jumlah,
-            'stok_sebelum' => $barang->stok,
-            'stok_sesudah' => 0,
-            'keterangan' => 'Penghapusan barang',
-            'user_id' => Auth::id(),
-        ]);
+        // Catat riwayat penghapusan
+        RiwayatBarangController::tambahRiwayat(
+            $barang->id,
+            'hapus',
+            $barang->jumlah,
+            'Penghapusan barang'
+        );
         
         // Delete image if exists
-        if ($barang->gambar) {
-            Storage::disk('public')->delete($barang->gambar);
+        if ($barang->foto) {
+            Storage::disk('public')->delete($barang->foto);
         }
         
         $barang->delete();
@@ -274,34 +262,20 @@ class BarangController extends Controller
     {
         $this->checkRole();
         
-        // Log the request data for debugging
-        \Illuminate\Support\Facades\Log::info('Bulk destroy request details', [
-            'method' => $request->method(),
-            'has_barang_ids' => $request->has('barang_ids'),
-            'barang_ids_type' => gettype($request->input('barang_ids')),
-            'content_type' => $request->header('Content-Type')
-        ]);
-        
-        // Get IDs - handle if no IDs are selected
         if (!$request->has('barang_ids') || empty($request->input('barang_ids'))) {
             return redirect()->route('barang.manage')
                 ->with('error', 'Silakan pilih setidaknya satu barang untuk dihapus.');
         }
         
-        // Get array of IDs
         $barangIds = $request->input('barang_ids');
-        
-        // Convert to array if string
         if (is_string($barangIds)) {
             $barangIds = explode(',', $barangIds);
         }
         
-        // Process each item
         $count = 0;
         $errors = [];
         
         foreach ($barangIds as $barangId) {
-            // Skip if not a valid ID
             if (!is_numeric($barangId)) {
                 $errors[] = "ID tidak valid: {$barangId}";
                 continue;
@@ -314,41 +288,27 @@ class BarangController extends Controller
             }
             
             try {
-                // Log the deletion
-                RiwayatBarang::create([
-                    'barang_id' => $barang->id,
-                    'jenis_aktivitas' => 'hapus',
-                    'jumlah' => $barang->jumlah,
-                    'stok_sebelum' => $barang->stok,
-                    'stok_sesudah' => 0,
-                    'keterangan' => 'Penghapusan barang',
-                    'user_id' => Auth::id(),
-                ]);
+                // Catat riwayat penghapusan
+                RiwayatBarangController::tambahRiwayat(
+                    $barang->id,
+                    'hapus',
+                    $barang->jumlah,
+                    'Penghapusan barang'
+                );
                 
                 // Delete image if exists
-                if ($barang->gambar) {
-                    Storage::disk('public')->delete($barang->gambar);
+                if ($barang->foto) {
+                    Storage::disk('public')->delete($barang->foto);
                 }
                 
-                // Delete the item
                 $barang->delete();
                 $count++;
             } catch (\Exception $e) {
-                \Illuminate\Support\Facades\Log::error('Error deleting item', [
-                    'barang_id' => $barangId,
-                    'error' => $e->getMessage()
-                ]);
                 $errors[] = "Error menghapus ID {$barangId}: " . $e->getMessage();
             }
         }
         
-        // Redirect with appropriate message
         if (!empty($errors)) {
-            \Illuminate\Support\Facades\Log::warning('Bulk delete completed with errors', [
-                'errors' => $errors,
-                'deleted_count' => $count
-            ]);
-            
             return redirect()->route('barang.manage')
                 ->with('warning', "{$count} barang berhasil dihapus. Error: " . implode('; ', $errors));
         }
@@ -364,13 +324,6 @@ class BarangController extends Controller
     {
         $this->checkRole();
         
-        // Log the request
-        \Illuminate\Support\Facades\Log::info('Bulk destroy GET method accessed', [
-            'url' => $request->fullUrl(),
-            'get_params' => $request->query()
-        ]);
-        
-        // Get IDs from the query string
         $ids = $request->query('ids');
         
         if (empty($ids)) {
@@ -378,12 +331,8 @@ class BarangController extends Controller
                 ->with('error', 'Tidak ada barang yang dipilih untuk dihapus.');
         }
         
-        // Convert comma-separated string to array
         $barangIds = explode(',', $ids);
-        
-        // Process each item
         $count = 0;
-        $errors = [];
         
         foreach ($barangIds as $barangId) {
             if (!is_numeric($barangId)) {
@@ -396,20 +345,17 @@ class BarangController extends Controller
             }
             
             try {
-                // Log the deletion
-                RiwayatBarang::create([
-                    'barang_id' => $barang->id,
-                    'jenis_aktivitas' => 'hapus',
-                    'jumlah' => $barang->jumlah,
-                    'stok_sebelum' => $barang->stok,
-                    'stok_sesudah' => 0,
-                    'keterangan' => 'Penghapusan barang',
-                    'user_id' => Auth::id(),
-                ]);
+                // Catat riwayat penghapusan
+                RiwayatBarangController::tambahRiwayat(
+                    $barang->id,
+                    'hapus',
+                    $barang->jumlah,
+                    'Penghapusan barang'
+                );
                 
                 // Delete image if exists
-                if ($barang->gambar) {
-                    Storage::disk('public')->delete($barang->gambar);
+                if ($barang->foto) {
+                    Storage::disk('public')->delete($barang->foto);
                 }
                 
                 $barang->delete();

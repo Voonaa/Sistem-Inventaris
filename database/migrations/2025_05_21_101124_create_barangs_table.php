@@ -21,11 +21,12 @@ return new class extends Migration
             $table->enum('kondisi', ['baik', 'kurang_baik', 'rusak'])->default('baik');
             $table->enum('status', ['tersedia', 'dipinjam', 'maintenance'])->default('tersedia');
             $table->string('lokasi')->nullable();
-            $table->integer('stok')->default(0);
+            $table->integer('jumlah')->default(0);
             $table->decimal('harga_perolehan', 12, 2)->nullable();
             $table->string('sumber_dana')->nullable();
             $table->string('foto')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

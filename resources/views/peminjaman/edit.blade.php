@@ -48,7 +48,7 @@
                                         <option value="{{ $barang->id }}" 
                                             {{ old('barang_id', $peminjaman->barang_id) == $barang->id ? 'selected' : '' }}
                                             data-stok="{{ ($barang->id == $peminjaman->barang_id) ? $barang->stok + $peminjaman->jumlah : $barang->stok }}">
-                                            {{ $barang->nama_barang }} (Stok: {{ ($barang->id == $peminjaman->barang_id) ? $barang->stok + $peminjaman->jumlah : $barang->stok }})
+                                            {{ $barang->nama_barang }} (Jumlah: {{ ($barang->id == $peminjaman->barang_id) ? $barang->stok + $peminjaman->jumlah : $barang->stok }})
                                         </option>
                                     @endforeach
                                 </select>
@@ -135,7 +135,7 @@
                     const availableStock = barangStocks[selectedBarangId];
                     
                     if (requestedAmount > availableStock) {
-                        alert(`Jumlah melebihi stok tersedia (${availableStock})`);
+                        alert(`Jumlah melebihi jumlah tersedia (${availableStock})`);
                         jumlahInput.value = availableStock;
                     }
                     

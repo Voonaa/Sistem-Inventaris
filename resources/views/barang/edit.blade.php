@@ -77,9 +77,9 @@
                                 <x-input-error :messages="$errors->get('jumlah')" class="mt-2" />
                             </div>
                             
-                            <!-- Stok Tersedia (Read-only) -->
+                            <!-- Jumlah Tersedia (Read-only) -->
                             <div>
-                                <x-input-label for="stok_display" :value="__('Stok Tersedia')" />
+                                <x-input-label for="stok_display" :value="__('Jumlah Tersedia')" />
                                 <x-text-input id="stok_display" class="block mt-1 w-full bg-gray-100" type="number" :value="old('stok', $barang->stok)" disabled />
                                 <p class="text-xs text-gray-500 mt-1">Jumlah barang yang tersedia (tidak dapat diubah langsung)</p>
                                 <input type="hidden" name="stok" value="{{ old('stok', $barang->stok) }}">
@@ -90,9 +90,9 @@
                                 <x-input-label for="kondisi" :value="__('Kondisi')" />
                                 <select id="kondisi" name="kondisi" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm block mt-1 w-full" required>
                                     <option value="">Pilih Kondisi</option>
-                                    <option value="Baik" {{ old('kondisi', $barang->kondisi) == 'Baik' ? 'selected' : '' }}>Baik</option>
-                                    <option value="Kurang Baik" {{ old('kondisi', $barang->kondisi) == 'Kurang Baik' ? 'selected' : '' }}>Kurang Baik</option>
-                                    <option value="Rusak" {{ old('kondisi', $barang->kondisi) == 'Rusak' ? 'selected' : '' }}>Rusak</option>
+                                    <option value="baik" {{ old('kondisi', $barang->kondisi) == 'baik' ? 'selected' : '' }}>Baik</option>
+                                    <option value="kurang_baik" {{ old('kondisi', $barang->kondisi) == 'kurang_baik' ? 'selected' : '' }}>Kurang Baik</option>
+                                    <option value="rusak" {{ old('kondisi', $barang->kondisi) == 'rusak' ? 'selected' : '' }}>Rusak</option>
                                 </select>
                                 <x-input-error :messages="$errors->get('kondisi')" class="mt-2" />
                             </div>
@@ -100,9 +100,9 @@
                             <!-- Gambar -->
                             <div>
                                 <x-input-label for="gambar" :value="__('Gambar')" />
-                                @if($barang->gambar)
+                                @if($barang->foto)
                                     <div class="mb-2">
-                                        <img src="{{ asset('storage/' . $barang->gambar) }}" alt="{{ $barang->nama_barang }}" class="h-24 w-auto object-contain">
+                                        <img src="{{ asset('storage/' . $barang->foto) }}" alt="{{ $barang->nama_barang }}" class="h-24 w-auto object-contain">
                                         <p class="text-sm text-gray-500">Gambar saat ini</p>
                                     </div>
                                 @endif

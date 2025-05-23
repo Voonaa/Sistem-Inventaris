@@ -67,7 +67,7 @@
                                     <option value="">Pilih Barang</option>
                                     @foreach($barangs as $barang)
                                         <option value="{{ $barang->id }}" data-max="{{ $barang->stok }}">
-                                            {{ $barang->nama_barang }} (Stok: {{ $barang->stok }})
+                                            {{ $barang->nama_barang }} (Jumlah: {{ $barang->stok }})
                                         </option>
                                     @endforeach
                                 </select>
@@ -133,6 +133,7 @@
                     const availableStock = barangStocks[selectedBarangId];
                     
                     if (requestedAmount > availableStock) {
+                        alert(`Jumlah melebihi jumlah tersedia (${availableStock})`);
                         alert(`Jumlah melebihi stok tersedia (${availableStock})`);
                         jumlahInput.value = availableStock;
                     }

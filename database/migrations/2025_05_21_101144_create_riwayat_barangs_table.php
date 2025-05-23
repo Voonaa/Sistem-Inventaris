@@ -16,8 +16,8 @@ return new class extends Migration
             $table->foreignId('barang_id')->constrained()->onDelete('cascade');
             $table->enum('jenis_aktivitas', ['tambah', 'kurang', 'pinjam', 'kembali', 'hapus']);
             $table->integer('jumlah');
-            $table->integer('stok_sebelum');
-            $table->integer('stok_sesudah');
+            $table->integer('jumlah_sebelum');
+            $table->integer('jumlah_sesudah');
             $table->text('keterangan')->nullable();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();

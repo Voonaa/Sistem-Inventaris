@@ -84,9 +84,9 @@
                                 <x-input-label for="kondisi" :value="__('Kondisi')" />
                                 <select id="kondisi" name="kondisi" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm block mt-1 w-full" required>
                                     <option value="">Pilih Kondisi</option>
-                                    <option value="Baik" {{ old('kondisi') == 'Baik' ? 'selected' : '' }}>Baik</option>
-                                    <option value="Kurang Baik" {{ old('kondisi') == 'Kurang Baik' ? 'selected' : '' }}>Kurang Baik</option>
-                                    <option value="Rusak" {{ old('kondisi') == 'Rusak' ? 'selected' : '' }}>Rusak</option>
+                                    <option value="baik" {{ old('kondisi') == 'baik' ? 'selected' : '' }}>Baik</option>
+                                    <option value="kurang_baik" {{ old('kondisi') == 'kurang_baik' ? 'selected' : '' }}>Kurang Baik</option>
+                                    <option value="rusak" {{ old('kondisi') == 'rusak' ? 'selected' : '' }}>Rusak</option>
                                 </select>
                                 <x-input-error :messages="$errors->get('kondisi')" class="mt-2" />
                             </div>
