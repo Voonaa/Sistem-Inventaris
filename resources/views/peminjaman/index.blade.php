@@ -27,31 +27,50 @@
                     </div>
                 @endif
 
+                <!-- Search Box -->
+                <div class="mb-4">
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                        <input type="text" id="searchInput" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Cari peminjaman (nama, kelas, barang, status...)">
+                    </div>
+                    <div class="mt-1 text-sm text-gray-500">
+                        Hasil pencarian: <span id="searchCount">{{ $peminjamans->count() }}</span> peminjaman ditemukan
+                    </div>
+                </div>
+
                 <div class="overflow-x-auto">
-                    <x-table>
-                        <x-slot name="header">
-                            <x-table.heading>Peminjam</x-table.heading>
-                            <x-table.heading>Jenis</x-table.heading>
-                            <x-table.heading>Kelas</x-table.heading>
-                            <x-table.heading>Barang</x-table.heading>
-                            <x-table.heading>Jumlah</x-table.heading>
-                            <x-table.heading>Tanggal Pinjam</x-table.heading>
-                            <x-table.heading>Tanggal Kembali</x-table.heading>
-                            <x-table.heading>Status</x-table.heading>
-                            <x-table.heading>Aksi</x-table.heading>
-                        </x-slot>
+                    <table id="peminjamanTable" class="min-w-full bg-white border border-gray-200">
+                        <thead>
+                            <tr>
+                                <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">No</th>
+                                <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Peminjam</th>
+                                <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Jenis</th>
+                                <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Kelas</th>
+                                <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Barang</th>
+                                <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Jumlah</th>
+                                <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Tanggal Pinjam</th>
+                                <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Tanggal Kembali</th>
+                                <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                                <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Aksi</th>
+                            </tr>
+                        </thead>
                         
                         <tbody>
-                            @forelse($peminjamans as $peminjaman)
+                            @forelse($peminjamans as $index => $peminjaman)
                                 <tr>
-                                    <x-table.cell>{{ $peminjaman->peminjam }}</x-table.cell>
-                                    <x-table.cell>{{ ucfirst($peminjaman->jenis) }}</x-table.cell>
-                                    <x-table.cell>{{ $peminjaman->kelas }}</x-table.cell>
-                                    <x-table.cell>{{ $peminjaman->barang->nama_barang ?? 'N/A' }}</x-table.cell>
-                                    <x-table.cell>{{ $peminjaman->jumlah }}</x-table.cell>
-                                    <x-table.cell>{{ $peminjaman->tanggal_pinjam->format('d/m/Y') }}</x-table.cell>
-                                    <x-table.cell>{{ $peminjaman->tanggal_kembali->format('d/m/Y') }}</x-table.cell>
-                                    <x-table.cell>
+                                    <td class="px-4 py-2 border-b border-gray-200">{{ $loop->iteration }}</td>
+                                    <td class="px-4 py-2 border-b border-gray-200">{{ $peminjaman->peminjam }}</td>
+                                    <td class="px-4 py-2 border-b border-gray-200">{{ ucfirst($peminjaman->jenis) }}</td>
+                                    <td class="px-4 py-2 border-b border-gray-200">{{ $peminjaman->kelas }}</td>
+                                    <td class="px-4 py-2 border-b border-gray-200">{{ $peminjaman->barang->nama_barang ?? 'N/A' }}</td>
+                                    <td class="px-4 py-2 border-b border-gray-200">{{ $peminjaman->jumlah }}</td>
+                                    <td class="px-4 py-2 border-b border-gray-200">{{ $peminjaman->tanggal_pinjam->format('d/m/Y') }}</td>
+                                    <td class="px-4 py-2 border-b border-gray-200">{{ $peminjaman->tanggal_kembali->format('d/m/Y') }}</td>
+                                    <td class="px-4 py-2 border-b border-gray-200">
                                         @if($peminjaman->status === 'dipinjam')
                                             @if($peminjaman->tanggal_kembali->isPast())
                                                 <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">Terlambat</span>
@@ -63,8 +82,8 @@
                                         @else
                                             <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">{{ $peminjaman->status }}</span>
                                         @endif
-                                    </x-table.cell>
-                                    <x-table.cell>
+                                    </td>
+                                    <td class="px-4 py-2 border-b border-gray-200">
                                         <div class="flex space-x-2">
                                             <a href="{{ route('peminjaman.show', $peminjaman->id) }}" class="text-blue-600 hover:text-blue-900">
                                                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -101,17 +120,17 @@
                                                 </button>
                                             </form>
                                         </div>
-                                    </x-table.cell>
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <x-table.cell colspan="9" class="text-center py-4">
+                                    <td colspan="10" class="px-4 py-2 text-center border-b border-gray-200">
                                         Tidak ada data peminjaman.
-                                    </x-table.cell>
+                                    </td>
                                 </tr>
                             @endforelse
                         </tbody>
-                    </x-table>
+                    </table>
                 </div>
                 
                 <div class="mt-4">
@@ -120,4 +139,52 @@
             </x-card>
         </div>
     </div>
+
+    <!-- JavaScript for Quick Search -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const tableRows = document.querySelectorAll('#peminjamanTable tbody tr');
+            const searchCount = document.getElementById('searchCount');
+            
+            searchInput.addEventListener('keyup', function() {
+                const searchTerm = searchInput.value.toLowerCase();
+                let visibleCount = 0;
+                
+                tableRows.forEach(row => {
+                    // Skip empty message row if it exists
+                    if (row.querySelector('td[colspan="10"]')) {
+                        row.style.display = tableRows.length === 1 ? '' : 'none';
+                        return;
+                    }
+                    
+                    const cells = row.querySelectorAll('td');
+                    let found = false;
+                    
+                    cells.forEach(cell => {
+                        if (cell.textContent.toLowerCase().includes(searchTerm)) {
+                            found = true;
+                        }
+                    });
+                    
+                    if (found) {
+                        row.style.display = '';
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+                
+                searchCount.textContent = visibleCount;
+                
+                // Show empty message if no rows match
+                if (visibleCount === 0 && tableRows.length > 1) {
+                    const firstRow = tableRows[0];
+                    if (firstRow.querySelector('td[colspan="10"]')) {
+                        firstRow.style.display = '';
+                    }
+                }
+            });
+        });
+    </script>
 </x-app-layout> 

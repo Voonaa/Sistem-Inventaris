@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>Laporan Barang</title>
+    <title>Laporan Pengguna</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -57,7 +57,7 @@
 </head>
 <body>
     <div class="header">
-        <h1>LAPORAN INVENTARIS BARANG</h1>
+        <h1>LAPORAN PENGGUNA SISTEM</h1>
         <p>SMK SASMITA JAYA</p>
         <p>Tanggal: {{ date('d-m-Y') }}</p>
     </div>
@@ -68,49 +68,47 @@
         <table style="width: 100%; border-collapse: separate; border-spacing: 5px;">
             <tr>
                 <td style="width: 33%; padding: 8px; background-color: white; border: 1px solid #ddd; border-radius: 3px;">
-                    <div style="font-size: 11px; color: #666;">Total Barang</div>
-                    <div style="font-size: 16px; font-weight: bold;">{{ count($barangs) }}</div>
+                    <div style="font-size: 11px; color: #666;">Total Pengguna</div>
+                    <div style="font-size: 16px; font-weight: bold;">{{ count($users) }}</div>
                 </td>
                 <td style="width: 33%; padding: 8px; background-color: white; border: 1px solid #ddd; border-radius: 3px;">
-                    <div style="font-size: 11px; color: #666;">Total Stok</div>
-                    <div style="font-size: 16px; font-weight: bold;">{{ $barangs->sum('stok') }} / {{ $barangs->sum('jumlah') }}</div>
+                    <div style="font-size: 11px; color: #666;">Admin</div>
+                    <div style="font-size: 16px; font-weight: bold;">{{ $users->where('role', 'admin')->count() }}</div>
                 </td>
                 <td style="width: 33%; padding: 8px; background-color: white; border: 1px solid #ddd; border-radius: 3px;">
-                    <div style="font-size: 11px; color: #666;">Kategori</div>
-                    <div style="font-size: 16px; font-weight: bold;">{{ $barangs->pluck('kategori')->unique()->count() }}</div>
+                    <div style="font-size: 11px; color: #666;">Operator</div>
+                    <div style="font-size: 16px; font-weight: bold;">{{ $users->where('role', 'operator')->count() }}</div>
                 </td>
             </tr>
         </table>
     </div>
     
-    <!-- Daftar Barang -->
-    <div class="section-title">Daftar Barang</div>
+    <!-- Daftar Pengguna -->
+    <div class="section-title">Daftar Pengguna</div>
     <table>
         <thead>
             <tr>
                 <th width="5%">No</th>
-                <th width="10%">Kode</th>
-                <th width="25%">Nama Barang</th>
-                <th width="15%">Kategori</th>
-                <th width="15%">Sub Kategori</th>
-                <th width="10%">Stok</th>
-                <th width="10%">Kondisi</th>
+                <th width="5%">ID</th>
+                <th width="25%">Nama</th>
+                <th width="30%">Email</th>
+                <th width="15%">Peran</th>
+                <th width="20%">Terdaftar</th>
             </tr>
         </thead>
         <tbody>
-            @forelse($barangs as $index => $item)
+            @forelse($users as $index => $user)
                 <tr>
                     <td>{{ $index + 1 }}</td>
-                    <td>{{ $item->kode_barang ?? '-' }}</td>
-                    <td>{{ $item->nama_barang }}</td>
-                    <td>{{ $item->kategori_label }}</td>
-                    <td>{{ $item->sub_kategori_label ?? '-' }}</td>
-                    <td>{{ $item->stok }} / {{ $item->jumlah }}</td>
-                    <td>{{ $item->kondisi }}</td>
+                    <td>{{ $user->id }}</td>
+                    <td>{{ $user->name }}</td>
+                    <td>{{ $user->email }}</td>
+                    <td>{{ ucfirst($user->role) }}</td>
+                    <td>{{ $user->created_at->format('d-m-Y') }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" style="text-align: center;">Tidak ada data barang</td>
+                    <td colspan="6" style="text-align: center;">Tidak ada data pengguna</td>
                 </tr>
             @endforelse
         </tbody>

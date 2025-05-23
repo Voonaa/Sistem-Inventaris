@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>Laporan Barang</title>
+    <title>Laporan Perpustakaan</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -47,70 +47,77 @@
             text-align: right;
             font-size: 10px;
         }
-        .summary {
-            margin-bottom: 20px; 
-            padding: 10px; 
-            background-color: #f5f5f5; 
-            border-radius: 5px;
+        .page-break {
+            page-break-after: always;
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>LAPORAN INVENTARIS BARANG</h1>
+        <h1>LAPORAN INVENTARIS PERPUSTAKAAN</h1>
         <p>SMK SASMITA JAYA</p>
         <p>Tanggal: {{ date('d-m-Y') }}</p>
     </div>
-    
-    <!-- Summary Section -->
-    <div class="summary">
-        <h3 style="font-size: 14px; margin-bottom: 10px; color: #333;">Informasi Ringkas</h3>
-        <table style="width: 100%; border-collapse: separate; border-spacing: 5px;">
-            <tr>
-                <td style="width: 33%; padding: 8px; background-color: white; border: 1px solid #ddd; border-radius: 3px;">
-                    <div style="font-size: 11px; color: #666;">Total Barang</div>
-                    <div style="font-size: 16px; font-weight: bold;">{{ count($barangs) }}</div>
-                </td>
-                <td style="width: 33%; padding: 8px; background-color: white; border: 1px solid #ddd; border-radius: 3px;">
-                    <div style="font-size: 11px; color: #666;">Total Stok</div>
-                    <div style="font-size: 16px; font-weight: bold;">{{ $barangs->sum('stok') }} / {{ $barangs->sum('jumlah') }}</div>
-                </td>
-                <td style="width: 33%; padding: 8px; background-color: white; border: 1px solid #ddd; border-radius: 3px;">
-                    <div style="font-size: 11px; color: #666;">Kategori</div>
-                    <div style="font-size: 16px; font-weight: bold;">{{ $barangs->pluck('kategori')->unique()->count() }}</div>
-                </td>
-            </tr>
-        </table>
-    </div>
-    
-    <!-- Daftar Barang -->
-    <div class="section-title">Daftar Barang</div>
+
+    <!-- Buku Section -->
+    <div class="section-title">1. Daftar Buku</div>
     <table>
         <thead>
             <tr>
                 <th width="5%">No</th>
-                <th width="10%">Kode</th>
-                <th width="25%">Nama Barang</th>
-                <th width="15%">Kategori</th>
-                <th width="15%">Sub Kategori</th>
-                <th width="10%">Stok</th>
-                <th width="10%">Kondisi</th>
+                <th width="30%">Judul</th>
+                <th width="20%">Penulis</th>
+                <th width="10%">Tahun</th>
+                <th width="10%">Jumlah</th>
+                <th width="15%">Status</th>
             </tr>
         </thead>
         <tbody>
-            @forelse($barangs as $index => $item)
+            @forelse($buku as $index => $book)
                 <tr>
                     <td>{{ $index + 1 }}</td>
-                    <td>{{ $item->kode_barang ?? '-' }}</td>
+                    <td>{{ $book->judul }}</td>
+                    <td>{{ $book->penulis }}</td>
+                    <td>{{ $book->tahun_terbit }}</td>
+                    <td>{{ $book->jumlah }}</td>
+                    <td>{{ ucfirst($book->status) }}</td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="6" style="text-align: center;">Tidak ada data buku</td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+
+    <div class="page-break"></div>
+
+    <!-- Barang Perpustakaan Section -->
+    <div class="section-title">2. Barang Perpustakaan</div>
+    <table>
+        <thead>
+            <tr>
+                <th width="5%">No</th>
+                <th width="15%">Kode</th>
+                <th width="25%">Nama Barang</th>
+                <th width="15%">Sub Kategori</th>
+                <th width="10%">Stok</th>
+                <th width="15%">Kondisi</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($barangPerpustakaan as $index => $item)
+                <tr>
+                    <td>{{ $index + 1 }}</td>
+                    <td>{{ $item->kode_barang }}</td>
                     <td>{{ $item->nama_barang }}</td>
-                    <td>{{ $item->kategori_label }}</td>
-                    <td>{{ $item->sub_kategori_label ?? '-' }}</td>
+                    <td>{{ $item->sub_kategori ?? '-' }}</td>
                     <td>{{ $item->stok }} / {{ $item->jumlah }}</td>
                     <td>{{ $item->kondisi }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" style="text-align: center;">Tidak ada data barang</td>
+                    <td colspan="6" style="text-align: center;">Tidak ada data barang perpustakaan</td>
                 </tr>
             @endforelse
         </tbody>

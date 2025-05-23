@@ -113,7 +113,7 @@ class BarangController extends Controller
             'nama_barang' => 'required|string|max:255',
             'kategori' => 'required|string',
             'sub_kategori' => 'nullable|string|required_if:kategori,perpustakaan',
-            'kondisi' => 'required|in:Baik,Kurang Baik,Rusak',
+            'kondisi' => 'required|string|in:Baik,Kurang Baik,Rusak',
             'jumlah' => 'required|integer|min:1',
             'deskripsi' => 'nullable|string',
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -194,7 +194,7 @@ class BarangController extends Controller
             'nama_barang' => 'required|string|max:255',
             'kategori' => 'required|string',
             'sub_kategori' => 'nullable|string|required_if:kategori,perpustakaan',
-            'kondisi' => 'required|in:Baik,Kurang Baik,Rusak',
+            'kondisi' => 'required|string|in:Baik,Kurang Baik,Rusak',
             'jumlah' => 'required|integer|min:1',
             'stok' => 'required|integer|min:0',
             'deskripsi' => 'nullable|string',
@@ -274,16 +274,129 @@ class BarangController extends Controller
     {
         $this->checkRole();
         
-        $validated = $request->validate([
-            'barang_ids' => 'required|array',
-            'barang_ids.*' => 'exists:barangs,id',
+        // Log the request data for debugging
+        \Illuminate\Support\Facades\Log::info('Bulk destroy request details', [
+            'method' => $request->method(),
+            'has_barang_ids' => $request->has('barang_ids'),
+            'barang_ids_type' => gettype($request->input('barang_ids')),
+            'content_type' => $request->header('Content-Type')
         ]);
         
+        // Get IDs - handle if no IDs are selected
+        if (!$request->has('barang_ids') || empty($request->input('barang_ids'))) {
+            return redirect()->route('barang.manage')
+                ->with('error', 'Silakan pilih setidaknya satu barang untuk dihapus.');
+        }
+        
+        // Get array of IDs
+        $barangIds = $request->input('barang_ids');
+        
+        // Convert to array if string
+        if (is_string($barangIds)) {
+            $barangIds = explode(',', $barangIds);
+        }
+        
+        // Process each item
         $count = 0;
-        foreach ($validated['barang_ids'] as $barangId) {
+        $errors = [];
+        
+        foreach ($barangIds as $barangId) {
+            // Skip if not a valid ID
+            if (!is_numeric($barangId)) {
+                $errors[] = "ID tidak valid: {$barangId}";
+                continue;
+            }
+            
             $barang = Barang::find($barangId);
-            if ($barang) {
-                // Log the deletion first
+            if (!$barang) {
+                $errors[] = "Barang dengan ID {$barangId} tidak ditemukan";
+                continue;
+            }
+            
+            try {
+                // Log the deletion
+                RiwayatBarang::create([
+                    'barang_id' => $barang->id,
+                    'jenis_aktivitas' => 'hapus',
+                    'jumlah' => $barang->jumlah,
+                    'stok_sebelum' => $barang->stok,
+                    'stok_sesudah' => 0,
+                    'keterangan' => 'Penghapusan barang',
+                    'user_id' => Auth::id(),
+                ]);
+                
+                // Delete image if exists
+                if ($barang->gambar) {
+                    Storage::disk('public')->delete($barang->gambar);
+                }
+                
+                // Delete the item
+                $barang->delete();
+                $count++;
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Error deleting item', [
+                    'barang_id' => $barangId,
+                    'error' => $e->getMessage()
+                ]);
+                $errors[] = "Error menghapus ID {$barangId}: " . $e->getMessage();
+            }
+        }
+        
+        // Redirect with appropriate message
+        if (!empty($errors)) {
+            \Illuminate\Support\Facades\Log::warning('Bulk delete completed with errors', [
+                'errors' => $errors,
+                'deleted_count' => $count
+            ]);
+            
+            return redirect()->route('barang.manage')
+                ->with('warning', "{$count} barang berhasil dihapus. Error: " . implode('; ', $errors));
+        }
+        
+        return redirect()->route('barang.manage')
+            ->with('success', "{$count} barang berhasil dihapus.");
+    }
+
+    /**
+     * Remove multiple items from storage (GET method version)
+     */
+    public function bulkDestroyGet(Request $request)
+    {
+        $this->checkRole();
+        
+        // Log the request
+        \Illuminate\Support\Facades\Log::info('Bulk destroy GET method accessed', [
+            'url' => $request->fullUrl(),
+            'get_params' => $request->query()
+        ]);
+        
+        // Get IDs from the query string
+        $ids = $request->query('ids');
+        
+        if (empty($ids)) {
+            return redirect()->route('barang.manage')
+                ->with('error', 'Tidak ada barang yang dipilih untuk dihapus.');
+        }
+        
+        // Convert comma-separated string to array
+        $barangIds = explode(',', $ids);
+        
+        // Process each item
+        $count = 0;
+        $errors = [];
+        
+        foreach ($barangIds as $barangId) {
+            if (!is_numeric($barangId)) {
+                continue;
+            }
+            
+            $barang = Barang::find($barangId);
+            if (!$barang) {
+                continue;
+            }
+            
+            try {
+                // Log the deletion
                 RiwayatBarang::create([
                     'barang_id' => $barang->id,
                     'jenis_aktivitas' => 'hapus',
@@ -301,11 +414,16 @@ class BarangController extends Controller
                 
                 $barang->delete();
                 $count++;
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Error in bulk delete GET', [
+                    'id' => $barangId,
+                    'error' => $e->getMessage()
+                ]);
             }
         }
         
         return redirect()->route('barang.manage')
-                ->with('success', $count . ' barang berhasil dihapus.');
+            ->with('success', "{$count} barang berhasil dihapus.");
     }
 
     /**

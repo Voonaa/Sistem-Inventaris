@@ -27,10 +27,23 @@ class PeminjamanController extends Controller
     /**
      * Display a listing of the loans.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $peminjamans = Peminjaman::with(['user', 'barang'])
-            ->orderBy('created_at', 'desc')
+        $query = Peminjaman::with(['user', 'barang']);
+        
+        // Filter by status if provided
+        if ($request->has('status')) {
+            $status = $request->input('status');
+            if ($status === 'terlambat') {
+                $query->whereNull('tanggal_dikembalikan')
+                    ->where('tanggal_kembali', '<', now())
+                    ->where('status', 'dipinjam');
+            } else {
+                $query->where('status', $status);
+            }
+        }
+        
+        $peminjamans = $query->orderBy('created_at', 'desc')
             ->paginate(10);
             
         return view('peminjaman.index', compact('peminjamans'));

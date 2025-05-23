@@ -174,7 +174,7 @@
                         </div>
                         <div class="mt-4">
                             <a href="{{ route('riwayat-barang.index') }}" class="text-sm text-blue-600 hover:underline">Lihat semua aktivitas →</a>
-                </div>
+                        </div>
                     @else
                         <p class="text-gray-500">Tidak ada aktivitas terbaru.</p>
                     @endif

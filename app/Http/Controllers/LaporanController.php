@@ -7,13 +7,11 @@ use App\Models\Barang;
 use App\Models\Buku;
 use App\Models\Peminjaman;
 use App\Models\RiwayatBarang;
+use App\Models\User;
+use App\Models\History;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-use PDF;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\BarangExport;
-use App\Exports\PeminjamanExport;
-use App\Exports\RiwayatBarangExport;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class LaporanController extends Controller
 {
@@ -89,6 +87,20 @@ class LaporanController extends Controller
     }
     
     /**
+     * Generate perpustakaan (library) report.
+     */
+    public function perpustakaan(Request $request)
+    {
+        // Get all library items (books and other library items)
+        $buku = Buku::all();
+        
+        // Get general library items (barang with kategori=perpustakaan)
+        $barangPerpustakaan = Barang::where('kategori', 'perpustakaan')->get();
+        
+        return view('laporan.perpustakaan', compact('buku', 'barangPerpustakaan'));
+    }
+    
+    /**
      * Generate peminjaman (borrowing) report.
      */
     public function peminjaman(Request $request)
@@ -150,30 +162,87 @@ class LaporanController extends Controller
     }
     
     /**
-     * Export report to PDF or Excel
+     * Export report to CSV
      */
     public function export(Request $request, $type)
     {
-        $format = $request->input('format', 'pdf');
         $fileName = $type . '_report_' . date('Y-m-d_H-i-s');
         
         switch ($type) {
             case 'inventaris':
                 // Redirect to barang export as inventaris export doesn't exist
-                return redirect()->route('laporan.export', ['type' => 'barang', 'format' => $format])
+                return redirect()->route('laporan.export', ['type' => 'barang'])
                     ->with('info', 'Export inventaris dialihkan ke export barang');
                 break;
                 
             case 'barang':
                 $barangs = Barang::all();
                 
-                if ($format === 'pdf') {
-                    // Use simple PDF generation since view might not exist
-                    $pdf = PDF::loadView('laporan.exports.barang_pdf', compact('barangs'));
-                    return $pdf->download($fileName . '.pdf');
-                } else {
-                    return Excel::download(new BarangExport($barangs), $fileName . '.xlsx');
-                }
+                return $this->exportToCSV($fileName, function($handle) use ($barangs) {
+                    // Add headers
+                    fputcsv($handle, [
+                        'Kode Barang',
+                        'Nama Barang',
+                        'Kategori',
+                        'Sub Kategori',
+                        'Jumlah Total',
+                        'Jumlah Tersedia',
+                        'Kondisi',
+                        'Lokasi',
+                        'Tahun Perolehan',
+                    ]);
+                    
+                    // Add data rows
+                    foreach ($barangs as $barang) {
+                        fputcsv($handle, [
+                            $barang->kode_barang,
+                            $barang->nama_barang,
+                            $barang->kategori->nama ?? '-',
+                            $barang->subKategori->nama ?? '-',
+                            $barang->jumlah,
+                            $barang->stok,
+                            $barang->kondisi,
+                            $barang->lokasi ?? '-',
+                            $barang->tahun_perolehan ?? '-',
+                        ]);
+                    }
+                });
+                break;
+                
+            case 'perpustakaan':
+                // Get all library items
+                $buku = Buku::all();
+                $barangPerpustakaan = Barang::where('kategori', 'perpustakaan')->get();
+                
+                return $this->exportToCSV($fileName, function($handle) use ($barangPerpustakaan) {
+                    // Add headers
+                    fputcsv($handle, [
+                        'Kode Barang',
+                        'Nama Barang',
+                        'Kategori',
+                        'Sub Kategori',
+                        'Jumlah Total',
+                        'Jumlah Tersedia',
+                        'Kondisi',
+                        'Lokasi',
+                        'Tahun Perolehan',
+                    ]);
+                    
+                    // Add data rows
+                    foreach ($barangPerpustakaan as $barang) {
+                        fputcsv($handle, [
+                            $barang->kode_barang,
+                            $barang->nama_barang,
+                            $barang->kategori->nama ?? '-',
+                            $barang->subKategori->nama ?? '-',
+                            $barang->jumlah,
+                            $barang->stok,
+                            $barang->kondisi,
+                            $barang->lokasi ?? '-',
+                            $barang->tahun_perolehan ?? '-',
+                        ]);
+                    }
+                });
                 break;
                 
             case 'peminjaman':
@@ -193,12 +262,31 @@ class LaporanController extends Controller
                 
                 $peminjamans = $query->orderBy('tanggal_pinjam', 'desc')->get();
                 
-                if ($format === 'pdf') {
-                    $pdf = PDF::loadView('laporan.exports.peminjaman_pdf', compact('peminjamans', 'startDate', 'endDate'));
-                    return $pdf->download($fileName . '.pdf');
-                } else {
-                    return Excel::download(new PeminjamanExport($peminjamans), $fileName . '.xlsx');
-                }
+                return $this->exportToCSV($fileName, function($handle) use ($peminjamans) {
+                    // Add headers
+                    fputcsv($handle, [
+                        'Tanggal Pinjam',
+                        'Tanggal Kembali',
+                        'Nama Peminjam',
+                        'Barang',
+                        'Jumlah',
+                        'Status',
+                        'Catatan'
+                    ]);
+                    
+                    // Add data rows
+                    foreach ($peminjamans as $peminjaman) {
+                        fputcsv($handle, [
+                            $peminjaman->tanggal_pinjam,
+                            $peminjaman->tanggal_kembali ?? '-',
+                            $peminjaman->user->name ?? '-',
+                            $peminjaman->barang->nama_barang ?? '-',
+                            $peminjaman->jumlah,
+                            $peminjaman->status,
+                            $peminjaman->catatan ?? '-'
+                        ]);
+                    }
+                });
                 break;
                 
             case 'pergerakan':
@@ -218,16 +306,130 @@ class LaporanController extends Controller
                 
                 $riwayats = $query->orderBy('created_at', 'desc')->get();
                 
-                if ($format === 'pdf') {
-                    $pdf = PDF::loadView('laporan.exports.pergerakan_pdf', compact('riwayats', 'startDate', 'endDate'));
-                    return $pdf->download($fileName . '.pdf');
+                return $this->exportToCSV($fileName, function($handle) use ($riwayats) {
+                    // Add headers
+                    fputcsv($handle, [
+                        'Tanggal',
+                        'Pengguna',
+                        'Jenis Aktivitas',
+                        'Barang',
+                        'Jumlah',
+                        'Keterangan'
+                    ]);
+                    
+                    // Add data rows
+                    foreach ($riwayats as $riwayat) {
+                        fputcsv($handle, [
+                            $riwayat->created_at,
+                            $riwayat->user->name ?? '-',
+                            $riwayat->jenis_aktivitas,
+                            $riwayat->barang->nama_barang ?? '-',
+                            $riwayat->jumlah,
+                            $riwayat->keterangan ?? '-'
+                        ]);
+                    }
+                });
+                break;
+                
+            case 'pengguna':
+                // Get all users
+                $users = User::all();
+                
+                return $this->exportToCSV($fileName, function($handle) use ($users) {
+                    // Add headers
+                    fputcsv($handle, [
+                        'ID',
+                        'Nama',
+                        'Email',
+                        'Role',
+                        'Terdaftar Pada'
+                    ]);
+                    
+                    // Add data rows
+                    foreach ($users as $user) {
+                        fputcsv($handle, [
+                            $user->id,
+                            $user->name,
+                            $user->email,
+                            $user->role,
+                            $user->created_at
+                        ]);
+                    }
+                });
+                break;
+                
+            case 'history':
+                // Filter options
+                $startDate = $request->input('start_date', Carbon::now()->subDays(30)->format('Y-m-d'));
+                $endDate = $request->input('end_date', Carbon::now()->format('Y-m-d'));
+                
+                // Get histories using Eloquent if History model exists, otherwise use query builder
+                if (class_exists('\App\Models\History')) {
+                    $histories = History::with(['user', 'barang'])
+                        ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+                        ->orderBy('created_at', 'desc')
+                        ->get();
                 } else {
-                    return Excel::download(new RiwayatBarangExport($riwayats), $fileName . '.xlsx');
+                    // Fallback to RiwayatBarang which might be the history model with a different name
+                    $histories = RiwayatBarang::with(['user', 'barang'])
+                        ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+                        ->orderBy('created_at', 'desc')
+                        ->get();
                 }
+                
+                return $this->exportToCSV($fileName, function($handle) use ($histories) {
+                    // Add headers
+                    fputcsv($handle, [
+                        'Tanggal',
+                        'Pengguna',
+                        'Jenis Aktivitas',
+                        'Barang',
+                        'Jumlah',
+                        'Keterangan'
+                    ]);
+                    
+                    // Add data rows
+                    foreach ($histories as $history) {
+                        fputcsv($handle, [
+                            $history->created_at,
+                            $history->user->name ?? '-',
+                            $history->jenis_aktivitas ?? $history->aktivitas ?? '-',
+                            $history->barang->nama_barang ?? '-',
+                            $history->jumlah ?? '-',
+                            $history->keterangan ?? '-'
+                        ]);
+                    }
+                });
                 break;
                 
             default:
                 return back()->with('error', 'Jenis laporan tidak valid');
         }
+    }
+
+    /**
+     * Export data to CSV
+     * 
+     * @param string $fileName The file name without extension
+     * @param \Closure $callback Function to write data to the CSV file
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     */
+    protected function exportToCSV($fileName, \Closure $callback)
+    {
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $fileName . '.csv"',
+        ];
+
+        return new StreamedResponse(function() use ($callback) {
+            $handle = fopen('php://output', 'w');
+            
+            // Use UTF-8 BOM for Excel compatibility
+            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+            
+            $callback($handle);
+            
+            fclose($handle);
+        }, 200, $headers);
     }
 } 

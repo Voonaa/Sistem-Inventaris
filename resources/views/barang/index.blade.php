@@ -96,24 +96,43 @@
                     </div>
                 </div>
 
+                <!-- Search Box -->
+                <div class="mb-4">
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                        <input type="text" id="searchInput" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Cari barang (kode, nama, kategori, kondisi...)">
+                    </div>
+                    <div class="mt-1 text-sm text-gray-500">
+                        Hasil pencarian: <span id="searchCount">{{ $barangs->count() }}</span> barang ditemukan
+                    </div>
+                </div>
+
                 <div class="overflow-x-auto">
-                    <x-table>
-                        <x-slot name="header">
-                            <x-table.heading>Kode</x-table.heading>
-                            <x-table.heading>Nama</x-table.heading>
-                            <x-table.heading>Kategori</x-table.heading>
-                            <x-table.heading>Sub Kategori</x-table.heading>
-                            <x-table.heading>Stok</x-table.heading>
-                            <x-table.heading>Kondisi</x-table.heading>
-                            <x-table.heading>Aksi</x-table.heading>
-                        </x-slot>
+                    <table id="barangTable" class="min-w-full bg-white border border-gray-200">
+                        <thead>
+                            <tr>
+                                <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">No</th>
+                                <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Kode</th>
+                                <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Nama Barang</th>
+                                <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Kategori</th>
+                                <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Sub Kategori</th>
+                                <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Stok</th>
+                                <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Kondisi</th>
+                                <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Aksi</th>
+                            </tr>
+                        </thead>
                         
                         <tbody>
-                            @forelse($barangs as $barang)
+                            @forelse($barangs as $index => $barang)
                                 <tr>
-                                    <x-table.cell>{{ $barang->kode_barang }}</x-table.cell>
-                                    <x-table.cell>{{ $barang->nama_barang }}</x-table.cell>
-                                    <x-table.cell>
+                                    <td class="px-4 py-2 border-b border-gray-200">{{ $loop->iteration }}</td>
+                                    <td class="px-4 py-2 border-b border-gray-200">{{ $barang->kode_barang }}</td>
+                                    <td class="px-4 py-2 border-b border-gray-200">{{ $barang->nama_barang }}</td>
+                                    <td class="px-4 py-2 border-b border-gray-200">
                                         @php
                                             $categoryLabel = '';
                                             if(isset($categories[$barang->kategori])) {
@@ -125,8 +144,8 @@
                                             }
                                         @endphp
                                         {{ $categoryLabel }}
-                                    </x-table.cell>
-                                    <x-table.cell>
+                                    </td>
+                                    <td class="px-4 py-2 border-b border-gray-200">
                                         @if($barang->kategori == 'perpustakaan' && $barang->sub_kategori)
                                             @php
                                                 $subCategoryLabel = '';
@@ -140,11 +159,11 @@
                                         @else
                                             -
                                         @endif
-                                    </x-table.cell>
-                                    <x-table.cell>
+                                    </td>
+                                    <td class="px-4 py-2 border-b border-gray-200">
                                         {{ $barang->stok }} / {{ $barang->jumlah }}
-                                    </x-table.cell>
-                                    <x-table.cell>
+                                    </td>
+                                    <td class="px-4 py-2 border-b border-gray-200">
                                         @if($barang->kondisi == 'Baik')
                                             <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Baik</span>
                                         @elseif($barang->kondisi == 'Kurang Baik')
@@ -154,8 +173,8 @@
                                         @else
                                             <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">{{ $barang->kondisi }}</span>
                                         @endif
-                                    </x-table.cell>
-                                    <x-table.cell>
+                                    </td>
+                                    <td class="px-4 py-2 border-b border-gray-200">
                                         <div class="flex space-x-2">
                                             <a href="{{ route('barang.show', $barang->id) }}" class="text-blue-600 hover:text-blue-900">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -180,17 +199,17 @@
                                                 </button>
                                             </form>
                                         </div>
-                                    </x-table.cell>
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <x-table.cell colspan="7" class="text-center py-4">
+                                    <td colspan="8" class="px-4 py-2 text-center border-b border-gray-200">
                                         Tidak ada data barang.
-                                    </x-table.cell>
+                                    </td>
                                 </tr>
                             @endforelse
                         </tbody>
-                    </x-table>
+                    </table>
                 </div>
                 
                 <div class="mt-4">
@@ -203,4 +222,52 @@
             </x-card>
         </div>
     </div>
+
+    <!-- JavaScript for Quick Search -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const tableRows = document.querySelectorAll('#barangTable tbody tr');
+            const searchCount = document.getElementById('searchCount');
+            
+            searchInput.addEventListener('keyup', function() {
+                const searchTerm = searchInput.value.toLowerCase();
+                let visibleCount = 0;
+                
+                tableRows.forEach(row => {
+                    // Skip empty message row if it exists
+                    if (row.querySelector('td[colspan="8"]')) {
+                        row.style.display = tableRows.length === 1 ? '' : 'none';
+                        return;
+                    }
+                    
+                    const cells = row.querySelectorAll('td');
+                    let found = false;
+                    
+                    cells.forEach(cell => {
+                        if (cell.textContent.toLowerCase().includes(searchTerm)) {
+                            found = true;
+                        }
+                    });
+                    
+                    if (found) {
+                        row.style.display = '';
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+                
+                searchCount.textContent = visibleCount;
+                
+                // Show empty message if no rows match
+                if (visibleCount === 0 && tableRows.length > 1) {
+                    const firstRow = tableRows[0];
+                    if (firstRow.querySelector('td[colspan="8"]')) {
+                        firstRow.style.display = '';
+                    }
+                }
+            });
+        });
+    </script>
 </x-app-layout> 

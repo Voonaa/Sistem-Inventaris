@@ -5,6 +5,7 @@ return [
     'perpustakaan' => [
         'label' => 'Perpustakaan',
         'sub' => [
+            'barang_perpustakaan' => 'Barang Perpustakaan',
             'buku_umum' => 'Buku Umum',
             'cerita_pendek' => 'Cerita Pendek',
             'instalasi' => 'Buku Teknik Instalasi',

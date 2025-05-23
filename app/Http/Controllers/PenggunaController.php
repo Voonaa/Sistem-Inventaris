@@ -6,6 +6,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
 
 class PenggunaController extends Controller
 {
@@ -14,7 +16,7 @@ class PenggunaController extends Controller
      */
     public function index()
     {
-        $users = User::all();
+        $users = User::paginate(15);
         return view('pengguna.index', compact('users'));
     }
 
@@ -23,7 +25,8 @@ class PenggunaController extends Controller
      */
     public function create()
     {
-        return view('pengguna.create');
+        // Instead of using a separate view, we'll create a new view for this
+        return view('profile.create');
     }
 
     /**
@@ -54,7 +57,8 @@ class PenggunaController extends Controller
      */
     public function show(User $pengguna)
     {
-        return view('pengguna.show', compact('pengguna'));
+        // Redirect to edit page since we don't have a dedicated show page
+        return redirect()->route('pengguna.edit', $pengguna);
     }
 
     /**
@@ -62,7 +66,11 @@ class PenggunaController extends Controller
      */
     public function edit(User $pengguna)
     {
-        return view('pengguna.edit', compact('pengguna'));
+        // Return to profile edit view but with the selected user data
+        return view('profile.edit', [
+            'user' => $pengguna,
+            'isAdminEdit' => true // Flag to indicate this is admin editing a user
+        ]);
     }
 
     /**

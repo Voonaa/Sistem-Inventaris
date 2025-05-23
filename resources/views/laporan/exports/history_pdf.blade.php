@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>Laporan Pergerakan Barang</title>
+    <title>Laporan Riwayat Aktivitas</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -62,7 +62,7 @@
 </head>
 <body>
     <div class="header">
-        <h1>LAPORAN PERGERAKAN BARANG</h1>
+        <h1>LAPORAN RIWAYAT AKTIVITAS BARANG</h1>
         <p>SMK SASMITA JAYA</p>
         <p>Tanggal: {{ date('d-m-Y') }}</p>
     </div>
@@ -77,57 +77,53 @@
         <table style="width: 100%; border-collapse: separate; border-spacing: 5px;">
             <tr>
                 <td style="width: 25%; padding: 8px; background-color: white; border: 1px solid #ddd; border-radius: 3px;">
-                    <div style="font-size: 11px; color: #666;">Total Transaksi</div>
-                    <div style="font-size: 16px; font-weight: bold;">{{ count($riwayats) }}</div>
+                    <div style="font-size: 11px; color: #666;">Total Aktivitas</div>
+                    <div style="font-size: 16px; font-weight: bold;">{{ count($histories) }}</div>
                 </td>
                 <td style="width: 25%; padding: 8px; background-color: white; border: 1px solid #ddd; border-radius: 3px;">
-                    <div style="font-size: 11px; color: #666;">Tambah</div>
-                    <div style="font-size: 16px; font-weight: bold;">{{ $riwayats->where('jenis_aktivitas', 'tambah')->count() }}</div>
+                    <div style="font-size: 11px; color: #666;">Barang Masuk</div>
+                    <div style="font-size: 16px; font-weight: bold;">{{ $histories->where('jenis_aktivitas', 'masuk')->count() }}</div>
                 </td>
                 <td style="width: 25%; padding: 8px; background-color: white; border: 1px solid #ddd; border-radius: 3px;">
-                    <div style="font-size: 11px; color: #666;">Kurang</div>
-                    <div style="font-size: 16px; font-weight: bold;">{{ $riwayats->where('jenis_aktivitas', 'kurang')->count() }}</div>
+                    <div style="font-size: 11px; color: #666;">Barang Keluar</div>
+                    <div style="font-size: 16px; font-weight: bold;">{{ $histories->where('jenis_aktivitas', 'keluar')->count() }}</div>
                 </td>
                 <td style="width: 25%; padding: 8px; background-color: white; border: 1px solid #ddd; border-radius: 3px;">
-                    <div style="font-size: 11px; color: #666;">Hapus</div>
-                    <div style="font-size: 16px; font-weight: bold;">{{ $riwayats->where('jenis_aktivitas', 'hapus')->count() }}</div>
+                    <div style="font-size: 11px; color: #666;">Perubahan</div>
+                    <div style="font-size: 16px; font-weight: bold;">{{ $histories->whereNotIn('jenis_aktivitas', ['masuk', 'keluar'])->count() }}</div>
                 </td>
             </tr>
         </table>
     </div>
     
-    <!-- Daftar Pergerakan Barang -->
-    <div class="section-title">Daftar Pergerakan Barang</div>
+    <!-- Daftar Aktivitas -->
+    <div class="section-title">Daftar Riwayat Aktivitas</div>
     <table>
         <thead>
             <tr>
                 <th width="5%">No</th>
-                <th width="10%">Kode</th>
+                <th width="15%">Waktu</th>
+                <th width="15%">Petugas</th>
                 <th width="20%">Barang</th>
                 <th width="10%">Jenis</th>
                 <th width="10%">Jumlah</th>
-                <th width="10%">Stok Sebelum</th>
-                <th width="10%">Stok Sesudah</th>
-                <th width="10%">Petugas</th>
-                <th width="15%">Tanggal</th>
+                <th width="25%">Catatan</th>
             </tr>
         </thead>
         <tbody>
-            @forelse($riwayats as $index => $item)
+            @forelse($histories as $index => $item)
                 <tr>
                     <td>{{ $index + 1 }}</td>
-                    <td>{{ $item->kode_riwayat ?? $item->id }}</td>
+                    <td>{{ $item->created_at->format('d-m-Y H:i') }}</td>
+                    <td>{{ $item->user->name ?? 'N/A' }}</td>
                     <td>{{ $item->barang->nama_barang ?? 'N/A' }}</td>
                     <td>{{ ucfirst($item->jenis_aktivitas) }}</td>
                     <td>{{ $item->jumlah }}</td>
-                    <td>{{ $item->stok_sebelum }}</td>
-                    <td>{{ $item->stok_sesudah }}</td>
-                    <td>{{ $item->user->name ?? 'N/A' }}</td>
-                    <td>{{ date('d-m-Y H:i', strtotime($item->created_at)) }}</td>
+                    <td>{{ $item->keterangan ?? '-' }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="9" style="text-align: center;">Tidak ada data pergerakan barang</td>
+                    <td colspan="7" style="text-align: center;">Tidak ada data riwayat aktivitas</td>
                 </tr>
             @endforelse
         </tbody>

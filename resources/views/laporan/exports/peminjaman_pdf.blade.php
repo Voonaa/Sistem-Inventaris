@@ -1,16 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>Laporan Peminjaman</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             font-size: 12px;
+            line-height: 1.4;
         }
-        h1 {
+        .header {
             text-align: center;
             margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        .header p {
+            font-size: 12px;
+            margin: 0;
         }
         .date-range {
             text-align: center;
@@ -20,31 +29,50 @@
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
         }
         th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
+            padding: 5px;
             text-align: left;
         }
         th {
             background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .section-title {
+            font-size: 14px;
+            font-weight: bold;
+            margin: 15px 0 5px 0;
         }
         .footer {
             margin-top: 20px;
             text-align: right;
             font-size: 10px;
         }
+        .summary {
+            margin-bottom: 20px; 
+            padding: 10px; 
+            background-color: #f5f5f5; 
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
-    <h1>Laporan Peminjaman</h1>
+    <div class="header">
+        <h1>LAPORAN PEMINJAMAN INVENTARIS</h1>
+        <p>SMK SASMITA JAYA</p>
+        <p>Tanggal: {{ date('d-m-Y') }}</p>
+    </div>
     
     <div class="date-range">
         Periode: {{ date('d-m-Y', strtotime($startDate)) }} s/d {{ date('d-m-Y', strtotime($endDate)) }}
     </div>
     
     <!-- Summary Section -->
-    <div style="margin-bottom: 20px; margin-top: 15px; padding: 10px; background-color: #f5f5f5; border-radius: 5px;">
+    <div class="summary">
         <h3 style="font-size: 14px; margin-bottom: 10px; color: #333;">Informasi Ringkas</h3>
         <table style="width: 100%; border-collapse: separate; border-spacing: 5px;">
             <tr>
@@ -64,37 +92,41 @@
         </table>
     </div>
     
+    <!-- Daftar Peminjaman -->
+    <div class="section-title">Daftar Peminjaman</div>
     <table>
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Peminjam</th>
-                <th>Barang</th>
-                <th>Tanggal Pinjam</th>
-                <th>Tanggal Kembali</th>
-                <th>Status</th>
+                <th width="5%">No</th>
+                <th width="10%">Kode</th>
+                <th width="20%">Peminjam</th>
+                <th width="20%">Barang</th>
+                <th width="15%">Tanggal Pinjam</th>
+                <th width="15%">Tanggal Kembali</th>
+                <th width="10%">Status</th>
             </tr>
         </thead>
         <tbody>
-            @forelse($peminjamans as $item)
+            @forelse($peminjamans as $index => $item)
                 <tr>
-                    <td>{{ $item->id }}</td>
+                    <td>{{ $index + 1 }}</td>
+                    <td>{{ $item->kode_peminjaman ?? $item->id }}</td>
                     <td>{{ $item->user->name ?? 'N/A' }}</td>
-                    <td>{{ $item->barang->nama_barang ?? 'N/A' }}</td>
+                    <td>{{ $item->barang->nama_barang ?? ($item->buku->judul ?? 'N/A') }}</td>
                     <td>{{ $item->tanggal_pinjam ? date('d-m-Y', strtotime($item->tanggal_pinjam)) : 'N/A' }}</td>
                     <td>{{ $item->tanggal_kembali ? date('d-m-Y', strtotime($item->tanggal_kembali)) : 'N/A' }}</td>
                     <td>{{ ucfirst($item->status) }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6" style="text-align: center;">Tidak ada data peminjaman</td>
+                    <td colspan="7" style="text-align: center;">Tidak ada data peminjaman</td>
                 </tr>
             @endforelse
         </tbody>
     </table>
 
     <div class="footer">
-        Dicetak pada: {{ date('Y-m-d H:i:s') }}
+        <p>Laporan ini dibuat secara otomatis oleh sistem inventaris SMK Sasmita Jaya</p>
     </div>
 </body>
 </html> 
