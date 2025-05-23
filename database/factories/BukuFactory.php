@@ -18,8 +18,10 @@ class BukuFactory extends Factory
     {
         $stok = fake()->numberBetween(10, 100);
         $dipinjam = fake()->numberBetween(0, min(5, $stok));
+        $kategori = fake()->randomElement(['pelajaran', 'fiksi', 'non-fiksi', 'referensi', 'lainnya']);
         
         return [
+            'kode_barang' => 'BK' . fake()->unique()->numberBetween(1000, 9999),
             'judul' => fake()->sentence(3),
             'pengarang' => fake()->name(),
             'penerbit' => fake()->company(),
@@ -27,7 +29,7 @@ class BukuFactory extends Factory
             'isbn' => fake()->isbn13(),
             'jumlah_halaman' => fake()->numberBetween(50, 500),
             'deskripsi' => fake()->paragraph(),
-            'kategori' => fake()->randomElement(['pelajaran', 'fiksi', 'non-fiksi', 'referensi', 'lainnya']),
+            'kategori' => $kategori,
             'lokasi_rak' => 'Rak ' . fake()->randomLetter() . fake()->numberBetween(1, 20),
             'stok' => $stok,
             'dipinjam' => $dipinjam,
@@ -41,6 +43,7 @@ class BukuFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'kategori' => 'pelajaran',
+            'kode_barang' => 'BKP' . fake()->unique()->numberBetween(1000, 9999),
         ]);
     }
     
@@ -51,6 +54,7 @@ class BukuFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'kategori' => 'fiksi',
+            'kode_barang' => 'BKF' . fake()->unique()->numberBetween(1000, 9999),
         ]);
     }
     
@@ -61,6 +65,7 @@ class BukuFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'kategori' => 'non-fiksi',
+            'kode_barang' => 'BKN' . fake()->unique()->numberBetween(1000, 9999),
         ]);
     }
 }

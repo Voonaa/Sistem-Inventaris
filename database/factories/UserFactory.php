@@ -27,7 +27,7 @@ class UserFactory extends Factory
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
-            'role' => fake()->randomElement(['admin', 'staff', 'guru']),
+            'role' => fake()->randomElement(['admin', 'operator', 'viewer']),
             'phone_number' => fake()->phoneNumber(),
             'address' => fake()->address(),
             'password' => static::$password ??= Hash::make('password'),
@@ -56,22 +56,22 @@ class UserFactory extends Factory
     }
     
     /**
-     * Indicate that the user is a staff.
+     * Indicate that the user is an operator.
      */
-    public function staff(): static
+    public function operator(): static
     {
         return $this->state(fn (array $attributes) => [
-            'role' => 'staff',
+            'role' => 'operator',
         ]);
     }
     
     /**
-     * Indicate that the user is a guru.
+     * Indicate that the user is a viewer.
      */
-    public function guru(): static
+    public function viewer(): static
     {
         return $this->state(fn (array $attributes) => [
-            'role' => 'guru',
+            'role' => 'viewer',
         ]);
     }
 }

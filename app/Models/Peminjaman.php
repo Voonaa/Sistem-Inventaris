@@ -18,7 +18,6 @@ class Peminjaman extends Model
     protected $fillable = [
         'user_id',
         'barang_id',
-        'buku_id',
         'peminjam',
         'jenis',
         'kelas',
@@ -53,14 +52,6 @@ class Peminjaman extends Model
     }
     
     /**
-     * Get the buku that belongs to the peminjaman.
-     */
-    public function buku(): BelongsTo
-    {
-        return $this->belongsTo(Buku::class);
-    }
-    
-    /**
      * Get the barang that belongs to the peminjaman.
      */
     public function barang(): BelongsTo
@@ -83,11 +74,11 @@ class Peminjaman extends Model
      */
     public function calculateDenda($dendaPerHari = 1000)
     {
-        if ($this->status !== 'terlambat' || $this->tanggal_dikembalikan) {
+        if ($this->status !== 'dikembalikan' || !$this->tanggal_dikembalikan) {
             return 0;
         }
         
-        $daysLate = now()->diffInDays($this->tanggal_kembali, false);
-        return max(0, $daysLate) * $dendaPerHari;
+        $hariTerlambat = $this->tanggal_dikembalikan->diffInDays($this->tanggal_kembali, false);
+        return max(0, $hariTerlambat * $dendaPerHari);
     }
 }

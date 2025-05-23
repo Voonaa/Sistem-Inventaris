@@ -1,185 +1,230 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
-    </x-slot>
+@extends('layouts.app')
 
-    <div class="py-6">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <!-- Summary Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
-                <!-- Total Items -->
-                <x-card>
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h3 class="text-lg font-semibold text-gray-700">Total Barang</h3>
-                            <p class="text-3xl font-bold text-blue-600">{{ $totalBarang }}</p>
-                        </div>
-                        <div class="bg-blue-100 p-3 rounded-full">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                            </svg>
-                        </div>
-                    </div>
-                </x-card>
-
-                <!-- Stok Baik -->
-                <x-card>
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h3 class="text-lg font-semibold text-gray-700">Stok Baik</h3>
-                            <p class="text-3xl font-bold text-green-600">{{ $stokBaik }}</p>
-                        </div>
-                        <div class="bg-green-100 p-3 rounded-full">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                            </svg>
-                        </div>
-                    </div>
-                </x-card>
-
-                <!-- Stok Kurang Baik -->
-                <x-card>
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h3 class="text-lg font-semibold text-gray-700">Stok Kurang Baik</h3>
-                            <p class="text-3xl font-bold text-yellow-600">{{ $stokKurang }}</p>
-                        </div>
-                        <div class="bg-yellow-100 p-3 rounded-full">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                            </svg>
-                        </div>
-                    </div>
-                </x-card>
-
-                <!-- Stok Rusak -->
-                <x-card>
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h3 class="text-lg font-semibold text-gray-700">Stok Rusak</h3>
-                            <p class="text-3xl font-bold text-red-600">{{ $stokRusak }}</p>
-                        </div>
-                        <div class="bg-red-100 p-3 rounded-full">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                    </div>
-                </x-card>
-
-                <!-- Active Loans -->
-                <x-card>
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h3 class="text-lg font-semibold text-gray-700">Peminjaman Aktif</h3>
-                            <p class="text-3xl font-bold text-purple-600">{{ $activeLoans }}</p>
-                        </div>
-                        <div class="bg-purple-100 p-3 rounded-full">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                    </div>
-                </x-card>
+@section('content')
+<div class="space-y-6">
+    <!-- Statistik Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Total Barang -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Total Barang</p>
+                    <p class="text-2xl font-semibold text-gray-900">{{ $stats['total_barang'] }}</p>
+                </div>
             </div>
+        </div>
 
-            <!-- Content Sections -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Low Stock Items -->
-                <x-card>
-                    <h3 class="text-lg font-semibold text-gray-700 mb-4">Stok Rendah (< 5)</h3>
-                    @if(count($lowStock) > 0)
-                        <div class="overflow-x-auto">
-                            <x-table>
-                                <x-slot name="header">
-                                    <x-table.heading>Kode</x-table.heading>
-                                    <x-table.heading>Nama</x-table.heading>
-                                    <x-table.heading>Stok</x-table.heading>
-                                </x-slot>
-                                <tbody>
-                                    @foreach($lowStock as $barang)
-                                        <tr>
-                                            <x-table.cell>{{ $barang->kode_barang }}</x-table.cell>
-                                            <x-table.cell>{{ $barang->nama_barang ?? $barang->nama }}</x-table.cell>
-                                            <x-table.cell>
-                                                <span class="px-2 py-1 text-xs rounded-full {{ $barang->stok < 2 ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800' }}">
-                                                    {{ $barang->stok }}
-                                                </span>
-                                            </x-table.cell>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </x-table>
-                        </div>
-                        <div class="mt-4">
-                            <a href="{{ route('barang.index') }}" class="text-sm text-blue-600 hover:underline">Lihat semua barang →</a>
-                        </div>
-                    @else
-                        <p class="text-gray-500">Tidak ada barang dengan stok rendah.</p>
-                    @endif
-                </x-card>
+        <!-- Total Kategori -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-green-100 text-green-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Total Kategori</p>
+                    <p class="text-2xl font-semibold text-gray-900">{{ $stats['total_kategori'] }}</p>
+                </div>
+            </div>
+        </div>
 
-                <!-- Recent Activity -->
-                <x-card>
-                    <h3 class="text-lg font-semibold text-gray-700 mb-4">Aktivitas Terbaru</h3>
-                    @if(count($recentHistory) > 0)
-                        <div class="overflow-x-auto">
-                            <x-table>
-                                <x-slot name="header">
-                                    <x-table.heading>Barang</x-table.heading>
-                                    <x-table.heading>Aksi</x-table.heading>
-                                    <x-table.heading>User</x-table.heading>
-                                    <x-table.heading>Waktu</x-table.heading>
-                                </x-slot>
-                                <tbody>
-                                    @foreach($recentHistory as $history)
-                                        <tr>
-                                            <x-table.cell>
-                                                @if($history->barang)
-                                                    {{ $history->barang->nama_barang ?? $history->barang->nama }}
-                                                @elseif($history->buku)
-                                                    {{ $history->buku->judul }}
-                                                @else
-                                                    N/A
-                                                @endif
-                                            </x-table.cell>
-                                            <x-table.cell>
-                                                @php
-                                                    $badgeClass = 'bg-gray-100 text-gray-800';
-                                                    
-                                                    if ($history->jenis_aktivitas === 'tambah') {
-                                                        $badgeClass = 'bg-green-100 text-green-800';
-                                                    } elseif ($history->jenis_aktivitas === 'kurang' || $history->jenis_aktivitas === 'penyesuaian') {
-                                                        $badgeClass = 'bg-yellow-100 text-yellow-800';
-                                                    } elseif ($history->jenis_aktivitas === 'peminjaman') {
-                                                        $badgeClass = 'bg-blue-100 text-blue-800';
-                                                    } elseif ($history->jenis_aktivitas === 'pengembalian') {
-                                                        $badgeClass = 'bg-purple-100 text-purple-800';
-                                                    } elseif ($history->jenis_aktivitas === 'perbaikan') {
-                                                        $badgeClass = 'bg-orange-100 text-orange-800';
-                                                    }
-                                                @endphp
-                                                <span class="px-2 py-1 text-xs rounded-full {{ $badgeClass }}">
-                                                    {{ ucfirst($history->jenis_aktivitas) }}
-                                                </span>
-                                            </x-table.cell>
-                                            <x-table.cell>{{ $history->user->name ?? 'N/A' }}</x-table.cell>
-                                            <x-table.cell>{{ $history->created_at->format('d/m/Y H:i') }}</x-table.cell>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </x-table>
-                        </div>
-                        <div class="mt-4">
-                            <a href="{{ route('riwayat-barang.index') }}" class="text-sm text-blue-600 hover:underline">Lihat semua aktivitas →</a>
-                        </div>
-                    @else
-                        <p class="text-gray-500">Tidak ada aktivitas terbaru.</p>
-                    @endif
-                </x-card>
+        <!-- Total Users -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Total Users</p>
+                    <p class="text-2xl font-semibold text-gray-900">{{ $stats['total_users'] }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Peminjaman Aktif -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Peminjaman Aktif</p>
+                    <p class="text-2xl font-semibold text-gray-900">{{ $stats['peminjaman_aktif'] }}</p>
+                </div>
             </div>
         </div>
     </div>
-</x-app-layout>
+
+    <!-- Alerts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Barang Stok Menipis -->
+        <div class="bg-white rounded-lg shadow">
+            <div class="p-4 border-b border-gray-200">
+                <h2 class="text-lg font-medium text-gray-900">Barang Stok Menipis</h2>
+            </div>
+            <div class="p-4">
+                @if($barangMenipis->isEmpty())
+                    <p class="text-gray-500">Tidak ada barang dengan stok menipis</p>
+                @else
+                    <div class="space-y-4">
+                        @foreach($barangMenipis as $barang)
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium text-gray-900">{{ $barang->nama_barang }}</p>
+                                    <p class="text-sm text-gray-500">Kode: {{ $barang->kode_barang }}</p>
+                                </div>
+                                <span class="px-3 py-1 text-sm font-medium bg-red-100 text-red-800 rounded-full">
+                                    Stok: {{ $barang->stok }}
+                                </span>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+        </div>
+
+        <!-- Peminjaman Terlambat -->
+        <div class="bg-white rounded-lg shadow">
+            <div class="p-4 border-b border-gray-200">
+                <h2 class="text-lg font-medium text-gray-900">Peminjaman Terlambat</h2>
+            </div>
+            <div class="p-4">
+                @if($peminjamanTerlambat->isEmpty())
+                    <p class="text-gray-500">Tidak ada peminjaman yang terlambat</p>
+                @else
+                    <div class="space-y-4">
+                        @foreach($peminjamanTerlambat as $peminjaman)
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium text-gray-900">{{ $peminjaman->barang->nama_barang }}</p>
+                                    <p class="text-sm text-gray-500">Peminjam: {{ $peminjaman->user->name }}</p>
+                                </div>
+                                <span class="px-3 py-1 text-sm font-medium bg-yellow-100 text-yellow-800 rounded-full">
+                                    {{ $peminjaman->tanggal_kembali->diffForHumans() }}
+                                </span>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Grafik Peminjaman -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-lg font-medium text-gray-900 mb-4">Tren Peminjaman (7 Hari Terakhir)</h2>
+            <div class="h-64">
+                <canvas id="peminjamanChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Grafik Status Barang -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-lg font-medium text-gray-900 mb-4">Status Barang</h2>
+            <div class="h-64">
+                <canvas id="statusBarangChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Riwayat Peminjaman Terakhir -->
+    <div class="bg-white rounded-lg shadow">
+        <div class="p-4 border-b border-gray-200">
+            <h2 class="text-lg font-medium text-gray-900">Riwayat Peminjaman Terakhir</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Peminjam</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Barang</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Pinjam</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @foreach($riwayatPeminjaman as $peminjaman)
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">{{ $peminjaman->user->name }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ $peminjaman->barang->nama_barang }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ $peminjaman->tanggal_pinjam->format('d/m/Y') }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                    {{ $peminjaman->status === 'dipinjam' ? 'bg-green-100 text-green-800' : 
+                                       ($peminjaman->status === 'terlambat' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800') }}">
+                                    {{ ucfirst($peminjaman->status) }}
+                                </span>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Data untuk grafik dari PHP ke JavaScript
+    const peminjamanData = @json($peminjamanChart);
+    const statusBarangData = @json($statusBarang);
+
+    // Grafik Peminjaman
+    new Chart(document.getElementById('peminjamanChart'), {
+        type: 'line',
+        data: {
+            labels: peminjamanData.map(item => item.date),
+            datasets: [{
+                label: 'Jumlah Peminjaman',
+                data: peminjamanData.map(item => item.total),
+                borderColor: 'rgb(59, 130, 246)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+        }
+    });
+
+    // Grafik Status Barang
+    new Chart(document.getElementById('statusBarangChart'), {
+        type: 'doughnut',
+        data: {
+            labels: statusBarangData.map(item => item.status),
+            datasets: [{
+                data: statusBarangData.map(item => item.total),
+                backgroundColor: [
+                    'rgb(59, 130, 246)',
+                    'rgb(16, 185, 129)',
+                    'rgb(245, 158, 11)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+        }
+    });
+</script>
+@endpush
+@endsection

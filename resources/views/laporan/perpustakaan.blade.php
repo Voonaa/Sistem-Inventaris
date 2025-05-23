@@ -18,42 +18,22 @@
                         </div>
                     </div>
 
-                    <!-- Buku Section -->
-                    <div class="mb-8">
-                        <h3 class="text-lg font-medium mb-4">Buku</h3>
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full bg-white border border-gray-200">
-                                <thead>
-                                    <tr>
-                                        <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">No</th>
-                                        <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Judul</th>
-                                        <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Penulis</th>
-                                        <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Tahun</th>
-                                        <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Jumlah</th>
-                                        <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse($buku as $index => $book)
-                                        <tr>
-                                            <td class="px-4 py-2 border-b border-gray-200">{{ $index + 1 }}</td>
-                                            <td class="px-4 py-2 border-b border-gray-200">{{ $book->judul }}</td>
-                                            <td class="px-4 py-2 border-b border-gray-200">{{ $book->penulis }}</td>
-                                            <td class="px-4 py-2 border-b border-gray-200">{{ $book->tahun_terbit }}</td>
-                                            <td class="px-4 py-2 border-b border-gray-200">{{ $book->jumlah }}</td>
-                                            <td class="px-4 py-2 border-b border-gray-200">
-                                                <span class="px-2 py-1 text-xs rounded-full {{ $book->status === 'tersedia' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
-                                                    {{ ucfirst($book->status) }}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="6" class="px-4 py-2 text-center border-b border-gray-200">Tidak ada data buku</td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
+                    <!-- Summary Section -->
+                    <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                        <h3 class="text-md font-medium text-gray-700 mb-3">Informasi Ringkas</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="bg-white p-3 rounded-md shadow-sm border border-gray-200">
+                                <div class="text-sm text-gray-500">Total Barang</div>
+                                <div class="text-xl font-semibold">{{ count($barangPerpustakaan) }}</div>
+                            </div>
+                            <div class="bg-white p-3 rounded-md shadow-sm border border-gray-200">
+                                <div class="text-sm text-gray-500">Total Stok</div>
+                                <div class="text-xl font-semibold">{{ $barangPerpustakaan->sum('stok') }}</div>
+                            </div>
+                            <div class="bg-white p-3 rounded-md shadow-sm border border-gray-200">
+                                <div class="text-sm text-gray-500">Sub Kategori</div>
+                                <div class="text-xl font-semibold">{{ $barangPerpustakaan->pluck('sub_kategori')->unique()->count() }}</div>
+                            </div>
                         </div>
                     </div>
 
@@ -78,23 +58,23 @@
                                             <td class="px-4 py-2 border-b border-gray-200">{{ $index + 1 }}</td>
                                             <td class="px-4 py-2 border-b border-gray-200">{{ $item->kode_barang }}</td>
                                             <td class="px-4 py-2 border-b border-gray-200">{{ $item->nama_barang }}</td>
-                                            <td class="px-4 py-2 border-b border-gray-200">{{ $item->sub_kategori ?? '-' }}</td>
-                                            <td class="px-4 py-2 border-b border-gray-200">{{ $item->stok }} / {{ $item->jumlah }}</td>
+                                            <td class="px-4 py-2 border-b border-gray-200">{{ $item->sub_kategori_label ?? '-' }}</td>
+                                            <td class="px-4 py-2 border-b border-gray-200">{{ $item->stok }}</td>
                                             <td class="px-4 py-2 border-b border-gray-200">
-                                                @if($item->kondisi == 'Baik')
+                                                @if($item->kondisi == 'baik')
                                                     <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Baik</span>
-                                                @elseif($item->kondisi == 'Kurang Baik')
+                                                @elseif($item->kondisi == 'kurang_baik')
                                                     <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">Kurang Baik</span>
-                                                @elseif($item->kondisi == 'Rusak')
-                                                    <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">Rusak</span>
                                                 @else
-                                                    <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">{{ $item->kondisi }}</span>
+                                                    <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">Rusak</span>
                                                 @endif
                                             </td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="6" class="px-4 py-2 text-center border-b border-gray-200">Tidak ada data barang perpustakaan</td>
+                                            <td colspan="6" class="px-4 py-2 text-center border-b border-gray-200">
+                                                Tidak ada data barang perpustakaan.
+                                            </td>
                                         </tr>
                                     @endforelse
                                 </tbody>

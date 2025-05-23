@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Barang;
 use App\Models\Buku;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -30,16 +31,21 @@ class PeminjamanFactory extends Factory
         } elseif (strtotime($tanggalKembali) < time()) {
             $status = 'terlambat';
         }
+
+        // Randomly choose between barang and buku
+        $isPerpustakaan = fake()->boolean();
         
         return [
             'user_id' => User::inRandomOrder()->first() ?? User::factory(),
-            'buku_id' => Buku::inRandomOrder()->first() ?? Buku::factory(),
+            'barang_id' => $isPerpustakaan ? null : (Barang::inRandomOrder()->first() ?? Barang::factory()),
+            'buku_id' => $isPerpustakaan ? (Buku::inRandomOrder()->first() ?? Buku::factory()) : null,
             'tanggal_pinjam' => $tanggalPinjam,
             'tanggal_kembali' => $tanggalKembali,
             'tanggal_dikembalikan' => $tanggalDikembalikan,
             'status' => $status,
             'catatan' => fake()->optional(0.3)->sentence(),
             'denda' => $status === 'terlambat' ? fake()->numberBetween(1000, 50000) : 0,
+            'jumlah' => fake()->numberBetween(1, 3),
         ];
     }
     
@@ -87,6 +93,36 @@ class PeminjamanFactory extends Factory
                 'tanggal_dikembalikan' => null,
                 'status' => 'terlambat',
                 'denda' => fake()->numberBetween(1000, 50000),
+            ];
+        });
+    }
+
+    /**
+     * Configure the model factory.
+     *
+     * @return $this
+     */
+    public function barang()
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'barang_id' => Barang::factory(),
+                'buku_id' => null,
+            ];
+        });
+    }
+
+    /**
+     * Configure the model factory.
+     *
+     * @return $this
+     */
+    public function buku()
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'barang_id' => null,
+                'buku_id' => Buku::factory(),
             ];
         });
     }

@@ -4,11 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Barang;
-use App\Models\Buku;
 use App\Models\Peminjaman;
 use App\Models\RiwayatBarang;
 use App\Models\User;
-use App\Models\History;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -31,7 +29,6 @@ class LaporanController extends Controller
     {
         // Count data for dashboard stats
         $totalBarang = Barang::count();
-        $totalBuku = Buku::count();
         $totalPeminjaman = Peminjaman::count();
         $totalRiwayatBarang = RiwayatBarang::count();
         
@@ -48,7 +45,6 @@ class LaporanController extends Controller
         
         return view('laporan.index', compact(
             'totalBarang',
-            'totalBuku',
             'totalPeminjaman',
             'totalRiwayatBarang',
             'recentPeminjaman',
@@ -77,27 +73,14 @@ class LaporanController extends Controller
     }
     
     /**
-     * Generate buku (book) report.
-     */
-    public function buku(Request $request)
-    {
-        $buku = Buku::all();
-        
-        return view('laporan.buku', compact('buku'));
-    }
-    
-    /**
      * Generate perpustakaan (library) report.
      */
     public function perpustakaan(Request $request)
     {
-        // Get all library items (books and other library items)
-        $buku = Buku::all();
-        
         // Get general library items (barang with kategori=perpustakaan)
         $barangPerpustakaan = Barang::where('kategori', 'perpustakaan')->get();
         
-        return view('laporan.perpustakaan', compact('buku', 'barangPerpustakaan'));
+        return view('laporan.perpustakaan', compact('barangPerpustakaan'));
     }
     
     /**
@@ -185,11 +168,11 @@ class LaporanController extends Controller
                         'Nama Barang',
                         'Kategori',
                         'Sub Kategori',
-                        'Jumlah Total',
-                        'Jumlah Tersedia',
+                        'Stok',
                         'Kondisi',
                         'Lokasi',
-                        'Tahun Perolehan',
+                        'Harga Perolehan',
+                        'Sumber Dana'
                     ]);
                     
                     // Add data rows
@@ -197,21 +180,20 @@ class LaporanController extends Controller
                         fputcsv($handle, [
                             $barang->kode_barang,
                             $barang->nama_barang,
-                            $barang->kategori->nama ?? '-',
-                            $barang->subKategori->nama ?? '-',
-                            $barang->jumlah,
+                            $barang->kategori_label,
+                            $barang->sub_kategori_label ?? '-',
                             $barang->stok,
                             $barang->kondisi,
                             $barang->lokasi ?? '-',
-                            $barang->tahun_perolehan ?? '-',
+                            $barang->harga_perolehan ?? '-',
+                            $barang->sumber_dana ?? '-'
                         ]);
                     }
                 });
                 break;
                 
             case 'perpustakaan':
-                // Get all library items
-                $buku = Buku::all();
+                // Get general library items (barang with kategori=perpustakaan)
                 $barangPerpustakaan = Barang::where('kategori', 'perpustakaan')->get();
                 
                 return $this->exportToCSV($fileName, function($handle) use ($barangPerpustakaan) {
@@ -219,13 +201,10 @@ class LaporanController extends Controller
                     fputcsv($handle, [
                         'Kode Barang',
                         'Nama Barang',
-                        'Kategori',
                         'Sub Kategori',
-                        'Jumlah Total',
-                        'Jumlah Tersedia',
+                        'Stok',
                         'Kondisi',
-                        'Lokasi',
-                        'Tahun Perolehan',
+                        'Lokasi'
                     ]);
                     
                     // Add data rows
@@ -233,13 +212,10 @@ class LaporanController extends Controller
                         fputcsv($handle, [
                             $barang->kode_barang,
                             $barang->nama_barang,
-                            $barang->kategori->nama ?? '-',
-                            $barang->subKategori->nama ?? '-',
-                            $barang->jumlah,
+                            $barang->sub_kategori_label ?? '-',
                             $barang->stok,
                             $barang->kondisi,
-                            $barang->lokasi ?? '-',
-                            $barang->tahun_perolehan ?? '-',
+                            $barang->lokasi ?? '-'
                         ]);
                     }
                 });
@@ -358,24 +334,16 @@ class LaporanController extends Controller
                 });
                 break;
                 
-            case 'history':
+            case 'riwayat':
                 // Filter options
                 $startDate = $request->input('start_date', Carbon::now()->subDays(30)->format('Y-m-d'));
                 $endDate = $request->input('end_date', Carbon::now()->format('Y-m-d'));
                 
-                // Get histories using Eloquent if History model exists, otherwise use query builder
-                if (class_exists('\App\Models\History')) {
-                    $histories = History::with(['user', 'barang'])
-                        ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
-                        ->orderBy('created_at', 'desc')
-                        ->get();
-                } else {
-                    // Fallback to RiwayatBarang which might be the history model with a different name
-                    $histories = RiwayatBarang::with(['user', 'barang'])
-                        ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
-                        ->orderBy('created_at', 'desc')
-                        ->get();
-                }
+                // Get histories
+                $histories = RiwayatBarang::with(['user', 'barang'])
+                    ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+                    ->orderBy('created_at', 'desc')
+                    ->get();
                 
                 return $this->exportToCSV($fileName, function($handle) use ($histories) {
                     // Add headers
@@ -393,9 +361,9 @@ class LaporanController extends Controller
                         fputcsv($handle, [
                             $history->created_at,
                             $history->user->name ?? '-',
-                            $history->jenis_aktivitas ?? $history->aktivitas ?? '-',
+                            $history->jenis_aktivitas,
                             $history->barang->nama_barang ?? '-',
-                            $history->jumlah ?? '-',
+                            $history->jumlah,
                             $history->keterangan ?? '-'
                         ]);
                     }

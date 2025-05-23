@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
 
 class Barang extends Model
@@ -24,22 +23,13 @@ class Barang extends Model
         'deskripsi',
         'kategori',
         'sub_kategori',
-        'merek',
-        'model',
-        'nomor_seri',
-        'tahun_perolehan',
         'kondisi',
         'status',
         'lokasi',
-        'jumlah',
         'stok',
         'harga_perolehan',
         'sumber_dana',
-        'is_buku',
-        'buku_id',
-        'gambar',
-        'created_by',
-        'updated_by',
+        'foto'
     ];
     
     /**
@@ -48,11 +38,8 @@ class Barang extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'tahun_perolehan' => 'integer',
-        'jumlah' => 'integer',
         'stok' => 'integer',
-        'harga_perolehan' => 'decimal:2',
-        'is_buku' => 'boolean',
+        'harga_perolehan' => 'decimal:2'
     ];
     
     /**
@@ -101,29 +88,9 @@ class Barang extends Model
     }
     
     /**
-     * Virtual relationship for category - returns the category data.
-     * Used to make eager loading with('kategori') work for reports.
-     */
-    public function kategori()
-    {
-        // This is a virtual relationship to make eager loading work
-        return $this->belongsTo(self::class)->addEagerConstraints([]);
-    }
-    
-    /**
-     * Virtual relationship for sub category - returns the sub category data.
-     * Used to make eager loading with('subKategori') work for reports.
-     */
-    public function subKategori()
-    {
-        // Always return a valid relationship instance
-        return $this->belongsTo(self::class)->whereRaw('1 = 0'); // Empty relationship that will never match
-    }
-    
-    /**
      * Get kategori label accessor.
      */
-    public function getKategoriLabelAttribute()
+    public function getKategoriLabelAttribute(): string
     {
         $categories = config('categories', []);
         
@@ -135,13 +102,13 @@ class Barang extends Model
             }
         }
         
-        return Str::title(str_replace('_', ' ', $this->kategori));
+        return Str::title(str_replace('_', ' ', $this->kategori ?? 'Tidak Ada Kategori'));
     }
     
     /**
      * Get sub kategori label accessor.
      */
-    public function getSubKategoriLabelAttribute()
+    public function getSubKategoriLabelAttribute(): ?string
     {
         if (!$this->sub_kategori) {
             return null;

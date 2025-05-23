@@ -13,18 +13,13 @@ return new class extends Migration
     {
         Schema::create('riwayat_barangs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('buku_id')->nullable()->constrained('bukus')->onDelete('cascade');
-            $table->foreignId('barang_id')->nullable()->constrained('barangs')->onDelete('cascade');
-            $table->enum('jenis_aktivitas', ['tambah', 'kurang', 'penyesuaian', 'peminjaman', 'pengembalian', 'perbaikan']);
+            $table->foreignId('barang_id')->constrained()->onDelete('cascade');
+            $table->enum('jenis_aktivitas', ['tambah', 'kurang', 'pinjam', 'kembali', 'hapus']);
             $table->integer('jumlah');
             $table->integer('stok_sebelum');
             $table->integer('stok_sesudah');
             $table->text('keterangan')->nullable();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            
-            // Note: We've removed the check constraint to fix the migration issue
-            // This validation should be handled at the application level
-            
             $table->timestamps();
         });
     }

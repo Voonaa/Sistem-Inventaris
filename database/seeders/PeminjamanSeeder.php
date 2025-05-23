@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Barang;
 use App\Models\Buku;
 use App\Models\Peminjaman;
 use App\Models\User;
@@ -14,19 +15,31 @@ class PeminjamanSeeder extends Seeder
      */
     public function run(): void
     {
-        // Get users and books
+        // Get users, books, and barangs
         $users = User::all();
         $books = Buku::all();
+        $barangs = Barang::all();
         
-        if ($users->count() > 0 && $books->count() > 0) {
-            // Create some active loans
-            Peminjaman::factory()->count(15)->dipinjam()->create();
+        if ($users->count() > 0) {
+            // Create some active loans for barang
+            Peminjaman::factory()->count(10)->barang()->dipinjam()->create();
             
-            // Create some returned loans
-            Peminjaman::factory()->count(20)->dikembalikan()->create();
+            // Create some returned loans for barang
+            Peminjaman::factory()->count(15)->barang()->dikembalikan()->create();
             
-            // Create some overdue loans
-            Peminjaman::factory()->count(10)->terlambat()->create();
+            // Create some overdue loans for barang
+            Peminjaman::factory()->count(5)->barang()->terlambat()->create();
+
+            if ($books->count() > 0) {
+                // Create some active loans for books
+                Peminjaman::factory()->count(5)->buku()->dipinjam()->create();
+                
+                // Create some returned loans for books
+                Peminjaman::factory()->count(5)->buku()->dikembalikan()->create();
+                
+                // Create some overdue loans for books
+                Peminjaman::factory()->count(5)->buku()->terlambat()->create();
+            }
         }
     }
 }

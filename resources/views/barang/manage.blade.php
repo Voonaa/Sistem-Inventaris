@@ -124,28 +124,10 @@
                                     <td class="px-4 py-2 border-b border-gray-200">{{ $barang->kode_barang }}</td>
                                     <td class="px-4 py-2 border-b border-gray-200">{{ $barang->nama_barang }}</td>
                                     <td class="px-4 py-2 border-b border-gray-200">
-                                        @php
-                                            $categoryLabel = '';
-                                            if(isset($categories[$barang->kategori])) {
-                                                $categoryLabel = is_array($categories[$barang->kategori]) 
-                                                    ? $categories[$barang->kategori]['label'] 
-                                                    : $categories[$barang->kategori];
-                                            } else {
-                                                $categoryLabel = ucfirst(str_replace('_', ' ', $barang->kategori));
-                                            }
-                                        @endphp
-                                        {{ $categoryLabel }}
-                                        @if($barang->kategori == 'perpustakaan' && $barang->sub_kategori)
+                                        {{ $barang->kategori->nama ?? 'Tidak Ada Kategori' }}
+                                        @if($barang->subKategori)
                                             <span class="text-xs text-gray-500">
-                                                @php
-                                                    $subCategoryLabel = '';
-                                                    if(isset($categories['perpustakaan']['sub'][$barang->sub_kategori])) {
-                                                        $subCategoryLabel = $categories['perpustakaan']['sub'][$barang->sub_kategori];
-                                                    } else {
-                                                        $subCategoryLabel = ucfirst(str_replace('_', ' ', $barang->sub_kategori));
-                                                    }
-                                                @endphp
-                                                ({{ $subCategoryLabel }})
+                                                ({{ $barang->subKategori->nama }})
                                             </span>
                                         @endif
                                     </td>

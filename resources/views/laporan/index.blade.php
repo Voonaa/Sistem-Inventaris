@@ -7,7 +7,7 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                 <x-card>
                     <div class="flex items-center">
                         <div class="p-3 rounded-full bg-indigo-600 bg-opacity-75">
@@ -20,21 +20,6 @@
                         <div class="mx-5">
                             <h4 class="text-2xl font-semibold text-gray-700">{{ $totalBarang }}</h4>
                             <div class="text-gray-500">Total Barang</div>
-                        </div>
-                    </div>
-                </x-card>
-
-                <x-card>
-                    <div class="flex items-center">
-                        <div class="p-3 rounded-full bg-green-600 bg-opacity-75">
-                            <svg class="h-8 w-8 text-white" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M6.99998 11.2H21L22.4 23.8H5.59998L6.99998 11.2Z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
-                                <path d="M9.79999 8.4C9.79999 6.08041 11.6804 4.2 14 4.2C16.3196 4.2 18.2 6.08041 18.2 8.4V12.6C18.2 14.9197 16.3196 16.8 14 16.8C11.6804 16.8 9.79999 14.9197 9.79999 12.6V8.4Z" stroke="currentColor" stroke-width="2"></path>
-                            </svg>
-                        </div>
-                        <div class="mx-5">
-                            <h4 class="text-2xl font-semibold text-gray-700">{{ $totalBuku }}</h4>
-                            <div class="text-gray-500">Total Buku</div>
                         </div>
                     </div>
                 </x-card>
@@ -75,15 +60,15 @@
                         <div class="overflow-x-auto">
                             <x-table>
                                 <x-slot name="header">
-                                    <x-table.heading>Buku</x-table.heading>
+                                    <x-table.heading>Barang</x-table.heading>
                                     <x-table.heading>Peminjam</x-table.heading>
                                     <x-table.heading>Tanggal Pinjam</x-table.heading>
                                     <x-table.heading>Status</x-table.heading>
                                 </x-slot>
                                 @foreach($recentPeminjaman as $peminjaman)
                                     <tr>
-                                        <x-table.cell>{{ $peminjaman->buku->judul ?? 'N/A' }}</x-table.cell>
-                                        <x-table.cell>{{ $peminjaman->user->name ?? 'N/A' }}</x-table.cell>
+                                        <x-table.cell>{{ $peminjaman->barang->nama_barang ?? 'N/A' }}</x-table.cell>
+                                        <x-table.cell>{{ $peminjaman->peminjam ?? 'N/A' }}</x-table.cell>
                                         <x-table.cell>{{ $peminjaman->tanggal_pinjam ? date('d-m-Y', strtotime($peminjaman->tanggal_pinjam)) : 'N/A' }}</x-table.cell>
                                         <x-table.cell>
                                             @if($peminjaman->status == 'dipinjam')
@@ -118,25 +103,25 @@
                                     <x-table.heading>Barang</x-table.heading>
                                     <x-table.heading>Petugas</x-table.heading>
                                     <x-table.heading>Tanggal</x-table.heading>
-                                    <x-table.heading>Tipe</x-table.heading>
+                                    <x-table.heading>Aktivitas</x-table.heading>
                                 </x-slot>
                                 @foreach($recentRiwayat as $riwayat)
                                     <tr>
-                                        <x-table.cell>{{ $riwayat->barang->nama ?? 'N/A' }}</x-table.cell>
+                                        <x-table.cell>{{ $riwayat->barang->nama_barang ?? 'N/A' }}</x-table.cell>
                                         <x-table.cell>{{ $riwayat->user->name ?? 'N/A' }}</x-table.cell>
                                         <x-table.cell>{{ $riwayat->created_at ? date('d-m-Y', strtotime($riwayat->created_at)) : 'N/A' }}</x-table.cell>
                                         <x-table.cell>
-                                            @if($riwayat->tipe_riwayat == 'masuk')
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                                    Masuk
+                                            @if($riwayat->jenis_aktivitas == 'peminjaman')
+                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                                    Peminjaman
                                                 </span>
-                                            @elseif($riwayat->tipe_riwayat == 'keluar')
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                                    Keluar
+                                            @elseif($riwayat->jenis_aktivitas == 'pengembalian')
+                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                    Pengembalian
                                                 </span>
                                             @else
                                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                                                    {{ ucfirst($riwayat->tipe_riwayat) }}
+                                                    {{ ucfirst($riwayat->jenis_aktivitas) }}
                                                 </span>
                                             @endif
                                         </x-table.cell>
@@ -198,7 +183,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                                 </svg>
                             </div>
-                            <div class="ml-4 text-lg font-semibold">Laporan Riwayat</div>
+                            <div class="ml-4 text-lg font-semibold">Riwayat Barang</div>
                         </div>
                     </x-card>
                 </a>

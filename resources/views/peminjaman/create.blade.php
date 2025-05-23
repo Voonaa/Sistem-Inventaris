@@ -9,6 +9,28 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
+                    @if(session('success'))
+                        <div class="mb-4 px-4 py-2 bg-green-100 border border-green-400 text-green-700 rounded">
+                            {{ session('success') }}
+                        </div>
+                    @endif
+
+                    @if(session('error'))
+                        <div class="mb-4 px-4 py-2 bg-red-100 border border-red-400 text-red-700 rounded">
+                            {{ session('error') }}
+                        </div>
+                    @endif
+
+                    @if($errors->any())
+                        <div class="mb-4 px-4 py-2 bg-red-100 border border-red-400 text-red-700 rounded">
+                            <ul>
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
                     <form action="{{ route('peminjaman.store') }}" method="POST">
                         @csrf
                         
@@ -91,6 +113,7 @@
     @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
             const barangSelect = document.getElementById('barang_id');
             const jumlahInput = document.getElementById('jumlah');
             
@@ -122,6 +145,33 @@
             // Add event listeners
             barangSelect.addEventListener('change', checkStock);
             jumlahInput.addEventListener('change', checkStock);
+            
+            // Add form submit handler
+            form.addEventListener('submit', function(e) {
+                const selectedBarangId = barangSelect.value;
+                const requestedAmount = parseInt(jumlahInput.value) || 0;
+                
+                if (!selectedBarangId) {
+                    e.preventDefault();
+                    alert('Silakan pilih barang terlebih dahulu');
+                    return;
+                }
+                
+                if (requestedAmount <= 0) {
+                    e.preventDefault();
+                    alert('Jumlah harus lebih dari 0');
+                    return;
+                }
+                
+                if (selectedBarangId && barangStocks[selectedBarangId]) {
+                    const availableStock = barangStocks[selectedBarangId];
+                    if (requestedAmount > availableStock) {
+                        e.preventDefault();
+                        alert(`Jumlah melebihi stok tersedia (${availableStock})`);
+                        return;
+                    }
+                }
+            });
             
             // Initial check
             checkStock();

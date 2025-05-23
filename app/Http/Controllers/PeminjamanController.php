@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Api\PeminjamanController as ApiPeminjamanController;
 use App\Models\Barang;
-use App\Models\Buku;
 use App\Models\Peminjaman;
 use App\Models\RiwayatBarang;
 use App\Models\User;
@@ -94,34 +93,41 @@ class PeminjamanController extends Controller
         $barang = Barang::findOrFail($validated['barang_id']);
         
         if ($barang->stok < $validated['jumlah']) {
-            return back()->withInput()->with('error', 'Stok barang tidak mencukupi. Tersedia: ' . $barang->stok);
+            return back()
+                ->withInput()
+                ->with('error', 'Stok barang tidak mencukupi. Tersedia: ' . $barang->stok);
         }
 
         try {
             DB::beginTransaction();
 
             // Create the peminjaman
-            $peminjaman = Peminjaman::create([
-                'user_id' => Auth::id(), // User yang menginput peminjaman (petugas)
-                'barang_id' => $validated['barang_id'],
-                'peminjam' => $validated['peminjam'],
-                'jenis' => $validated['jenis'],
-                'kelas' => $validated['kelas'], 
-                'jumlah' => $validated['jumlah'],
-                'tanggal_pinjam' => $validated['tanggal_pinjam'],
-                'tanggal_kembali' => $validated['tanggal_kembali'],
-                'status' => 'dipinjam',
-            ]);
+            $peminjaman = new Peminjaman();
+            $peminjaman->user_id = Auth::id();
+            $peminjaman->barang_id = $validated['barang_id'];
+            $peminjaman->peminjam = $validated['peminjam'];
+            $peminjaman->jenis = $validated['jenis'];
+            $peminjaman->kelas = $validated['kelas'];
+            $peminjaman->jumlah = $validated['jumlah'];
+            $peminjaman->tanggal_pinjam = $validated['tanggal_pinjam'];
+            $peminjaman->tanggal_kembali = $validated['tanggal_kembali'];
+            $peminjaman->status = 'dipinjam';
+            
+            if (!$peminjaman->save()) {
+                throw new \Exception('Gagal menyimpan data peminjaman');
+            }
 
             // Update stock on the item
             $stokSebelum = $barang->stok;
             $stokSesudah = $stokSebelum - $validated['jumlah'];
             
             $barang->stok = $stokSesudah;
-            $barang->save();
+            if (!$barang->save()) {
+                throw new \Exception('Gagal mengupdate stok barang');
+            }
 
             // Log to RiwayatBarang
-            RiwayatBarang::create([
+            $riwayat = new RiwayatBarang([
                 'barang_id' => $barang->id,
                 'jenis_aktivitas' => 'peminjaman',
                 'jumlah' => $validated['jumlah'],
@@ -130,14 +136,27 @@ class PeminjamanController extends Controller
                 'keterangan' => 'Dipinjam oleh ' . $validated['peminjam'] . ' (' . $validated['jenis'] . ' - ' . $validated['kelas'] . ')',
                 'user_id' => Auth::id(),
             ]);
+            
+            if (!$riwayat->save()) {
+                throw new \Exception('Gagal mencatat riwayat peminjaman');
+            }
 
             DB::commit();
             
-            return redirect()->route('peminjaman.index')
+            return redirect()
+                ->route('peminjaman.index')
                 ->with('success', 'Peminjaman berhasil ditambahkan.');
+
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withInput()->with('error', 'Gagal menambahkan peminjaman: ' . $e->getMessage());
+            
+            // Log the error for debugging
+            \Log::error('Error in PeminjamanController@store: ' . $e->getMessage());
+            \Log::error($e->getTraceAsString());
+            
+            return back()
+                ->withInput()
+                ->with('error', 'Gagal menambahkan peminjaman: ' . $e->getMessage());
         }
     }
 

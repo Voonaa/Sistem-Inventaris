@@ -14,22 +14,17 @@ return new class extends Migration
         Schema::create('peminjamen', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('buku_id')->nullable()->constrained('bukus')->onDelete('cascade');
-            $table->foreignId('barang_id')->nullable()->constrained('barangs')->onDelete('cascade');
-            $table->string('peminjam')->nullable(); // Optional field for peminjam name
-            $table->string('jenis')->nullable(); // Optional field for categorization
-            $table->string('kelas')->nullable(); // Optional field for class/grade
-            $table->integer('jumlah')->default(1); // Number of items borrowed
+            $table->foreignId('barang_id')->constrained()->onDelete('cascade');
+            $table->string('peminjam');
+            $table->enum('jenis', ['siswa', 'guru'])->default('siswa');
+            $table->string('kelas');
+            $table->integer('jumlah')->default(1);
             $table->date('tanggal_pinjam');
             $table->date('tanggal_kembali');
             $table->date('tanggal_dikembalikan')->nullable();
             $table->enum('status', ['dipinjam', 'dikembalikan', 'terlambat'])->default('dipinjam');
             $table->text('catatan')->nullable();
             $table->decimal('denda', 10, 2)->default(0);
-            
-            // Note: We've removed the check constraint that was causing issues
-            // Instead, we'll enforce the rule through application logic
-            
             $table->timestamps();
         });
     }

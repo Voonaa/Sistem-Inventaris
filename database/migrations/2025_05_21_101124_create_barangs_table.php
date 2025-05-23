@@ -13,20 +13,18 @@ return new class extends Migration
     {
         Schema::create('barangs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('kategori_id')->nullable()->constrained('kategoris')->onDelete('set null');
-            $table->foreignId('sub_kategori_id')->nullable()->constrained('sub_kategoris')->onDelete('set null');
             $table->string('kode_barang')->unique();
             $table->string('nama_barang');
             $table->text('deskripsi')->nullable();
+            $table->string('kategori');
+            $table->string('sub_kategori')->nullable();
             $table->enum('kondisi', ['baik', 'kurang_baik', 'rusak'])->default('baik');
             $table->enum('status', ['tersedia', 'dipinjam', 'maintenance'])->default('tersedia');
             $table->string('lokasi')->nullable();
-            $table->date('tanggal_perolehan')->nullable();
-            $table->enum('sumber', ['pembelian', 'hibah', 'lainnya'])->default('pembelian');
-            $table->decimal('harga', 12, 2)->nullable();
-            $table->integer('stok')->default(1);
+            $table->integer('stok')->default(0);
+            $table->decimal('harga_perolehan', 12, 2)->nullable();
+            $table->string('sumber_dana')->nullable();
             $table->string('foto')->nullable();
-            $table->text('catatan')->nullable();
             $table->timestamps();
         });
     }
