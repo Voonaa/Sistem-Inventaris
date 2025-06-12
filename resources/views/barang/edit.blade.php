@@ -9,6 +9,27 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
+                    @if(session('success'))
+                        <div class="mb-4 px-4 py-2 bg-green-100 border border-green-400 text-green-700 rounded">
+                            {{ session('success') }}
+                        </div>
+                    @endif
+
+                    @if(session('error'))
+                        <div class="mb-4 px-4 py-2 bg-red-100 border border-red-400 text-red-700 rounded">
+                            {{ session('error') }}
+                        </div>
+                    @endif
+
+                    @if($errors->any())
+                        <div class="mb-4 px-4 py-2 bg-red-100 border border-red-400 text-red-700 rounded">
+                            <ul>
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
                     <form action="{{ route('barang.update', $barang->id) }}" method="POST" enctype="multipart/form-data"
                           x-data="{ 
                               kategori: '{{ old('kategori', $barang->kategori) }}', 
@@ -75,14 +96,6 @@
                                 <x-text-input id="jumlah" class="block mt-1 w-full" type="number" name="jumlah" :value="old('jumlah', $barang->jumlah)" min="1" required />
                                 <p class="text-xs text-gray-500 mt-1">Jumlah total barang</p>
                                 <x-input-error :messages="$errors->get('jumlah')" class="mt-2" />
-                            </div>
-                            
-                            <!-- Jumlah Tersedia (Read-only) -->
-                            <div>
-                                <x-input-label for="stok_display" :value="__('Jumlah Tersedia')" />
-                                <x-text-input id="stok_display" class="block mt-1 w-full bg-gray-100" type="number" :value="old('stok', $barang->stok)" disabled />
-                                <p class="text-xs text-gray-500 mt-1">Jumlah barang yang tersedia (tidak dapat diubah langsung)</p>
-                                <input type="hidden" name="stok" value="{{ old('stok', $barang->stok) }}">
                             </div>
                             
                             <!-- Kondisi -->

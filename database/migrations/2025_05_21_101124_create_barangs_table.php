@@ -25,6 +25,8 @@ return new class extends Migration
             $table->decimal('harga_perolehan', 12, 2)->nullable();
             $table->string('sumber_dana')->nullable();
             $table->string('foto')->nullable();
+            $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
+            $table->foreignId('updated_by')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamps();
             $table->softDeletes();
         });

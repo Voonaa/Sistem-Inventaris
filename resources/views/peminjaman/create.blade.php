@@ -67,7 +67,7 @@
                                     <option value="">Pilih Barang</option>
                                     @foreach($barangs as $barang)
                                         <option value="{{ $barang->id }}" data-max="{{ $barang->stok }}">
-                                            {{ $barang->nama_barang }} (Jumlah: {{ $barang->stok }})
+                                            {{ $barang->nama_barang }}
                                         </option>
                                     @endforeach
                                 </select>

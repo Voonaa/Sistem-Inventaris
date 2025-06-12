@@ -86,13 +86,13 @@
                         <div class="flex items-center">
                             <div class="p-3 rounded-full bg-yellow-100">
                                 <svg class="h-8 w-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M12 15h.01"></path>
                                 </svg>
                             </div>
                             <div class="ml-4">
-                                <div class="text-sm font-medium text-gray-500">Peminjaman Aktif</div>
+                                <div class="text-sm font-medium text-gray-500">Total Peminjaman</div>
                                 <div class="text-2xl font-semibold">{{ $peminjamanAktif }}</div>
-                                <div class="text-xs text-gray-400">Sedang dipinjam</div>
+                                <div class="text-xs text-gray-400">Total transaksi peminjaman</div>
                             </div>
                         </div>
                     </div>

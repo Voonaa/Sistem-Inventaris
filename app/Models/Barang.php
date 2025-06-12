@@ -27,9 +27,12 @@ class Barang extends Model
         'status',
         'lokasi',
         'jumlah',
+        'stok',
         'harga_perolehan',
         'sumber_dana',
-        'foto'
+        'foto',
+        'created_by',
+        'updated_by'
     ];
     
     /**

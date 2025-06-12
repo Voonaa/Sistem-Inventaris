@@ -28,9 +28,6 @@ class RiwayatBarangController extends Controller
         // Hitung jumlah sesudah berdasarkan jenis aktivitas
         $jumlah_sesudah = $jumlah_sebelum;
         switch ($jenis_aktivitas) {
-            case 'tambah':
-                $jumlah_sesudah = $jumlah_sebelum + $jumlah;
-                break;
             case 'kurang':
             case 'pinjam':
                 $jumlah_sesudah = $jumlah_sebelum - $jumlah;
@@ -55,7 +52,7 @@ class RiwayatBarangController extends Controller
         ]);
 
         // Update jumlah barang
-        if ($jenis_aktivitas != 'hapus') {
+        if (in_array($jenis_aktivitas, ['kurang', 'pinjam', 'kembali', 'hapus'])) {
             $barang->jumlah = $jumlah_sesudah;
             $barang->save();
         }

@@ -50,7 +50,7 @@
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-lg font-semibold">Riwayat Barang</h3>
                         <!-- CSV Export Button -->
-                        <a href="{{ route('laporan.export', ['type' => 'history']) }}" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded text-sm">
+                        <a href="{{ route('laporan.export', ['type' => 'pergerakan']) }}" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded text-sm">
                             Export Excel
                         </a>
                     </div>

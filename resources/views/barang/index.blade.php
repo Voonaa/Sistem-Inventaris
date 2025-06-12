@@ -197,7 +197,7 @@
                                         @endif
                                     </td>
                                     <td class="px-4 py-2 border-b border-gray-200">
-                                        {{ $barang->stok }} {{ $barang->jumlah }}
+                                        {{ $barang->stok }}
                                     </td>
                                     <td class="px-4 py-2 border-b border-gray-200">
                                         @if($barang->kondisi == 'baik')

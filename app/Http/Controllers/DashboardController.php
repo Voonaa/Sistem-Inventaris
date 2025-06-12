@@ -30,7 +30,7 @@ class DashboardController extends Controller
         $totalBarang = Barang::count();
         $totalKategori = count(config('categories'));
         $totalUsers = User::count();
-        $peminjamanAktif = Peminjaman::where('status', 'dipinjam')->count();
+        $peminjamanAktif = Peminjaman::count();
         
         // Get recent activities
         $recentActivities = RiwayatBarang::with(['user', 'barang'])

@@ -123,6 +123,7 @@ class BarangController extends Controller
         }
         
         $validated['created_by'] = Auth::id();
+        $validated['stok'] = $validated['jumlah'];
         
         $barang = Barang::create($validated);
         \Log::info('Barang created', ['barang' => $barang->toArray()]);
@@ -189,7 +190,6 @@ class BarangController extends Controller
             'sub_kategori' => 'nullable|string|required_if:kategori,perpustakaan',
             'kondisi' => 'required|string|in:baik,kurang_baik,rusak',
             'jumlah' => 'required|integer|min:1',
-            'stok' => 'required|integer|min:0',
             'deskripsi' => 'nullable|string',
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
@@ -204,6 +204,9 @@ class BarangController extends Controller
             $validated['foto'] = $path;
         }
         
+        // Ensure stok is updated with the new jumlah
+        $validated['stok'] = $validated['jumlah'];
+
         // Calculate the difference in jumlah
         $jumlahDiff = $validated['jumlah'] - $barang->jumlah;
         

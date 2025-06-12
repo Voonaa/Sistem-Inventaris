@@ -2,6 +2,14 @@
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Hapus Barang') }}
+            @if(isset($activeKategori))
+                <span class="text-gray-500 font-normal text-lg">
+                    › {{ ucwords(str_replace('_', ' ', $activeKategori))
+                    @if(isset($activeSub) && $activeKategori === 'perpustakaan')
+                        › {{ ucwords(str_replace('_', ' ', $activeSub))
+                    @endif
+                </span>
+            @endif
         </h2>
     </x-slot>
 
@@ -63,21 +71,57 @@
                 <div class="bg-gray-50 rounded-lg p-4 mb-6">
                     <h3 class="text-md font-medium text-gray-700 mb-3">Informasi Ringkas</h3>
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div class="bg-white p-3 rounded-md shadow-sm border border-gray-200">
-                            <div class="text-sm text-gray-500">Total Barang</div>
-                            <div class="text-xl font-semibold">{{ $barangs->total() }}</div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 bg-blue-100 rounded-full p-3">
+                                    <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-500">Total Barang</div>
+                                    <div class="text-xl font-semibold text-gray-900">{{ $barangs->total() }}</div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="bg-white p-3 rounded-md shadow-sm border border-gray-200">
-                            <div class="text-sm text-gray-500">Barang Kondisi Baik</div>
-                            <div class="text-xl font-semibold">{{ $barangs->where('kondisi', 'Baik')->count() }}</div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 bg-green-100 rounded-full p-3">
+                                    <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-500">Barang Kondisi Baik</div>
+                                    <div class="text-xl font-semibold text-gray-900">{{ $barangs->where('kondisi', 'baik')->count() }}</div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="bg-white p-3 rounded-md shadow-sm border border-gray-200">
-                            <div class="text-sm text-gray-500">Barang Kondisi Rusak</div>
-                            <div class="text-xl font-semibold">{{ $barangs->where('kondisi', 'Rusak')->count() }}</div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 bg-red-100 rounded-full p-3">
+                                    <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-500">Barang Kondisi Rusak</div>
+                                    <div class="text-xl font-semibold text-gray-900">{{ $barangs->where('kondisi', 'rusak')->count() }}</div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="bg-white p-3 rounded-md shadow-sm border border-gray-200">
-                            <div class="text-sm text-gray-500">Total Jumlah</div>
-                            <div class="text-xl font-semibold">{{ $barangs->sum('stok') }} {{ $barangs->sum('jumlah') }}</div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 bg-yellow-100 rounded-full p-3">
+                                    <svg class="h-6 w-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.25 6.75h9.5m-9.5 3.5h9.5m-9.5 3.5h9.5m-9.5 3.5h9.5M4.5 6.75h.008v.008H4.5V6.75ZM4.5 10.25h.008v.008H4.5V10.25ZM4.5 13.75h.008v.008H4.5V13.75ZM4.5 17.25h.008v.008H4.5V17.25Z"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-500">Total Jumlah</div>
+                                    <div class="text-xl font-semibold text-gray-900">{{ $barangs->sum('jumlah') }}</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -111,6 +155,7 @@
                                 <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Kode</th>
                                 <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Nama Barang</th>
                                 <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Kategori</th>
+                                <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Sub Kategori</th>
                                 <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Jumlah</th>
                                 <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Kondisi</th>
                                 <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Aksi</th>
@@ -124,11 +169,31 @@
                                     <td class="px-4 py-2 border-b border-gray-200">{{ $barang->kode_barang }}</td>
                                     <td class="px-4 py-2 border-b border-gray-200">{{ $barang->nama_barang }}</td>
                                     <td class="px-4 py-2 border-b border-gray-200">
-                                        {{ $barang->kategori->nama ?? 'Tidak Ada Kategori' }}
-                                        @if($barang->subKategori)
-                                            <span class="text-xs text-gray-500">
-                                                ({{ $barang->subKategori->nama }})
-                                            </span>
+                                        @php
+                                            $categoryLabel = '';
+                                            if(isset($categories[$barang->kategori])) {
+                                                $categoryLabel = is_array($categories[$barang->kategori]) 
+                                                    ? $categories[$barang->kategori]['label'] 
+                                                    : $categories[$barang->kategori];
+                                            } else {
+                                                $categoryLabel = ucfirst(str_replace('_', ' ', $barang->kategori));
+                                            }
+                                        @endphp
+                                        {{ $categoryLabel }}
+                                    </td>
+                                    <td class="px-4 py-2 border-b border-gray-200">
+                                        @if($barang->kategori == 'perpustakaan' && $barang->sub_kategori)
+                                            @php
+                                                $subCategoryLabel = '';
+                                                if(isset($categories['perpustakaan']['sub'][$barang->sub_kategori])) {
+                                                    $subCategoryLabel = $categories['perpustakaan']['sub'][$barang->sub_kategori];
+                                                } else {
+                                                    $subCategoryLabel = ucfirst(str_replace('_', ' ', $barang->sub_kategori));
+                                                }
+                                            @endphp
+                                            {{ $subCategoryLabel }}
+                                        @else
+                                            -
                                         @endif
                                     </td>
                                     <td class="px-4 py-2 border-b border-gray-200">
@@ -167,7 +232,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="px-4 py-2 text-center border-b border-gray-200">
+                                    <td colspan="8" class="px-4 py-2 text-center border-b border-gray-200">
                                         Tidak ada data barang.
                                     </td>
                                 </tr>
@@ -200,7 +265,7 @@
                 
                 tableRows.forEach(row => {
                     // Skip empty message row if it exists
-                    if (row.querySelector('td[colspan="7"]')) {
+                    if (row.querySelector('td[colspan="8"]')) {
                         row.style.display = tableRows.length === 1 ? '' : 'none';
                         return;
                     }
@@ -227,7 +292,7 @@
                 // Show empty message if no rows match
                 if (visibleCount === 0 && tableRows.length > 1) {
                     const firstRow = tableRows[0];
-                    if (firstRow.querySelector('td[colspan="7"]')) {
+                    if (firstRow.querySelector('td[colspan="8"]')) {
                         firstRow.style.display = '';
                     }
                 }

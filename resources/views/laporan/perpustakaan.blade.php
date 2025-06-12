@@ -22,17 +22,44 @@
                     <div class="bg-gray-50 rounded-lg p-4 mb-6">
                         <h3 class="text-md font-medium text-gray-700 mb-3">Informasi Ringkas</h3>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div class="bg-white p-3 rounded-md shadow-sm border border-gray-200">
-                                <div class="text-sm text-gray-500">Total Barang</div>
-                                <div class="text-xl font-semibold">{{ count($barangPerpustakaan) }}</div>
+                            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 bg-blue-100 rounded-full p-3">
+                                        <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-500">Total Barang</div>
+                                        <div class="text-xl font-semibold text-gray-900">{{ count($barangPerpustakaan) }}</div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="bg-white p-3 rounded-md shadow-sm border border-gray-200">
-                                <div class="text-sm text-gray-500">Total Jumlah</div>
-                                <div class="text-xl font-semibold">{{ $barangPerpustakaan->sum('stok') }}</div>
+                            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 bg-indigo-100 rounded-full p-3">
+                                        <svg class="h-6 w-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14v6m-3-3h6m-9-11H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-3m-7 0L9 9m2-2V3m2 4H9"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-500">Total Jumlah</div>
+                                        <div class="text-xl font-semibold text-gray-900">{{ $barangPerpustakaan->sum('stok') }}</div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="bg-white p-3 rounded-md shadow-sm border border-gray-200">
-                                <div class="text-sm text-gray-500">Sub Kategori</div>
-                                <div class="text-xl font-semibold">{{ $barangPerpustakaan->pluck('sub_kategori')->unique()->count() }}</div>
+                            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 bg-green-100 rounded-full p-3">
+                                        <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-500">Sub Kategori</div>
+                                        <div class="text-xl font-semibold text-gray-900">{{ $barangPerpustakaan->pluck('sub_kategori')->unique()->count() }}</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
