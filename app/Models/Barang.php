@@ -27,7 +27,6 @@ class Barang extends Model
         'status',
         'lokasi',
         'jumlah',
-        'stok',
         'harga_perolehan',
         'sumber_dana',
         'foto',
@@ -44,11 +43,6 @@ class Barang extends Model
         'jumlah' => 'integer',
         'harga_perolehan' => 'decimal:2'
     ];
-    
-    /**
-     * Appends these accessor attributes to every query.
-     */
-    protected $appends = ['kategori_label', 'sub_kategori_label'];
     
     /**
      * Get the buku associated with the barang.

@@ -168,7 +168,7 @@ class LaporanController extends Controller
                         'Nama Barang',
                         'Kategori',
                         'Sub Kategori',
-                        'Stok',
+                        'Jumlah',
                         'Kondisi',
                         'Lokasi',
                         'Harga Perolehan',
@@ -182,7 +182,7 @@ class LaporanController extends Controller
                             $barang->nama_barang,
                             $barang->kategori_label,
                             $barang->sub_kategori_label ?? '-',
-                            $barang->stok,
+                            $barang->jumlah,
                             $barang->kondisi,
                             $barang->lokasi ?? '-',
                             $barang->harga_perolehan ?? '-',
@@ -202,7 +202,7 @@ class LaporanController extends Controller
                         'Kode Barang',
                         'Nama Barang',
                         'Sub Kategori',
-                        'Stok',
+                        'Jumlah',
                         'Kondisi',
                         'Lokasi'
                     ]);
@@ -213,7 +213,7 @@ class LaporanController extends Controller
                             $barang->kode_barang,
                             $barang->nama_barang,
                             $barang->sub_kategori_label ?? '-',
-                            $barang->stok,
+                            $barang->jumlah,
                             $barang->kondisi,
                             $barang->lokasi ?? '-'
                         ]);

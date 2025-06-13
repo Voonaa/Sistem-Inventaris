@@ -123,7 +123,6 @@ class BarangController extends Controller
         }
         
         $validated['created_by'] = Auth::id();
-        $validated['stok'] = $validated['jumlah'];
         
         $barang = Barang::create($validated);
         \Log::info('Barang created', ['barang' => $barang->toArray()]);
@@ -204,9 +203,6 @@ class BarangController extends Controller
             $validated['foto'] = $path;
         }
         
-        // Ensure stok is updated with the new jumlah
-        $validated['stok'] = $validated['jumlah'];
-
         // Calculate the difference in jumlah
         $jumlahDiff = $validated['jumlah'] - $barang->jumlah;
         

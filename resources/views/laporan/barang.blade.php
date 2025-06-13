@@ -43,8 +43,8 @@
                                         </svg>
                                     </div>
                                     <div class="ml-4">
-                                        <div class="text-sm font-medium text-gray-500">Total Stok</div>
-                                        <div class="text-xl font-semibold text-gray-900">{{ $barang->sum('stok') }} / {{ $barang->sum('jumlah') }}</div>
+                                        <div class="text-sm font-medium text-gray-500">Total Jumlah Barang</div>
+                                        <div class="text-xl font-semibold text-gray-900">{{ $barang->sum('jumlah') }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -73,7 +73,7 @@
                                     <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Nama Barang</th>
                                     <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Kategori</th>
                                     <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Sub Kategori</th>
-                                    <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Stok</th>
+                                    <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Jumlah</th>
                                     <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Kondisi</th>
                                 </tr>
                             </thead>
@@ -85,7 +85,7 @@
                                         <td class="px-4 py-2 border-b border-gray-200">{{ $item->nama_barang }}</td>
                                         <td class="px-4 py-2 border-b border-gray-200">{{ $item->kategori_label }}</td>
                                         <td class="px-4 py-2 border-b border-gray-200">{{ $item->sub_kategori_label ?? '-' }}</td>
-                                        <td class="px-4 py-2 border-b border-gray-200">{{ $item->stok }} / {{ $item->jumlah }}</td>
+                                        <td class="px-4 py-2 border-b border-gray-200">{{ $item->jumlah }}</td>
                                         <td class="px-4 py-2 border-b border-gray-200">
                                             @if($item->kondisi == 'Baik')
                                                 <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Baik</span>
