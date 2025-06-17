@@ -46,6 +46,11 @@ class DashboardController extends Controller
         $peminjamanTerlambat = Peminjaman::where('status', 'dipinjam')
             ->where('tanggal_kembali', '<', now())
             ->count();
+
+        // Data for chart: Barang by Condition
+        $barangBaikCount = Barang::where('kondisi', 'baik')->count();
+        $barangKurangBaikCount = Barang::where('kondisi', 'kurang_baik')->count();
+        $barangRusakCount = Barang::where('kondisi', 'rusak')->count();
         
         return view('dashboard', compact(
             'totalBarang',
@@ -54,7 +59,10 @@ class DashboardController extends Controller
             'peminjamanAktif',
             'recentActivities',
             'barangKurangBaik',
-            'peminjamanTerlambat'
+            'peminjamanTerlambat',
+            'barangBaikCount',
+            'barangKurangBaikCount',
+            'barangRusakCount'
         ));
     }
 } 

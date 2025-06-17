@@ -11,10 +11,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Seed users first
         $this->call([
-            RoleSeeder::class,
             UserSeeder::class,
-            // SampleBarangSeeder::class, // Removed as per user request
+        ]);
+
+        // Seed barang data
+        $this->call([
+            BarangSeeder::class,
         ]);
     }
-}
+} 

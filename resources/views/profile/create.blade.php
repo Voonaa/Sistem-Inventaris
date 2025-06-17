@@ -38,8 +38,6 @@
                                 <x-input-label for="role" :value="__('Peran')" />
                                 <select id="role" name="role" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
                                     <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                                    <option value="operator" {{ old('role') == 'operator' ? 'selected' : '' }}>Operator</option>
-                                    <option value="viewer" {{ old('role') == 'viewer' ? 'selected' : '' }}>Viewer</option>
                                 </select>
                                 <x-input-error class="mt-2" :messages="$errors->get('role')" />
                             </div>

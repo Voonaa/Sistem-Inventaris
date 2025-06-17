@@ -6,6 +6,9 @@
         </h2>
     </x-slot>
 
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- Welcome Message -->
@@ -99,6 +102,16 @@
                 </div>
             </div>
 
+            <!-- Barang Condition Chart -->
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                <div class="p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Analisis Kondisi Barang</h3>
+                    <div class="relative h-96 w-full">
+                        <canvas id="barangConditionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
             <!-- Recent Activities and Quick Actions -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Recent Activities -->
@@ -106,7 +119,7 @@
                     <div class="p-6">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-lg font-semibold text-gray-800">Aktivitas Terbaru</h3>
-                            <a href="{{ route('riwayat-barang.index') }}" class="text-sm text-blue-600 hover:text-blue-800">Lihat Semua</a>
+                            <a href="{{ route('history.index') }}" class="text-blue-500 hover:text-blue-600 text-sm font-medium">Lihat Semua</a>
                         </div>
                         @if($recentActivities->count() > 0)
                             <div class="space-y-4">
@@ -209,4 +222,60 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const ctx = document.getElementById('barangConditionChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Baik', 'Kurang Baik', 'Rusak'],
+                    datasets: [{
+                        data: [{{ $barangBaikCount }}, {{ $barangKurangBaikCount }}, {{ $barangRusakCount }}],
+                        backgroundColor: [
+                            'rgba(75, 192, 192, 0.8)', // Greenish for Baik
+                            'rgba(255, 206, 86, 0.8)', // Yellowish for Kurang Baik
+                            'rgba(255, 99, 132, 0.8)'  // Reddish for Rusak
+                        ],
+                        borderColor: [
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(255, 99, 132, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        label += context.parsed + ' Barang';
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
+                        legend: {
+                            position: 'bottom',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Distribusi Kondisi Barang',
+                            font: {
+                                size: 16
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
 </x-app-layout>

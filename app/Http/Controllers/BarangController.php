@@ -50,8 +50,24 @@ class BarangController extends Controller
             }
         }
 
+        // Apply search filter
+        if ($request->has('search') && !empty($request->search)) {
+            $searchTerm = $request->search;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('kode_barang', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('nama_barang', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('deskripsi', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('kondisi', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('lokasi', 'like', '%' . $searchTerm . '%');
+            });
+        }
+
+        // Get all barangs for summary statistics (unpaginated, with filters)
+        $allBarangs = $query->get();
+
+        // Get paginated barangs for the table display
         $barangs = $query->orderBy('created_at', 'desc')->paginate(10);
-        return view('barang.index', compact('barangs'));
+        return view('barang.index', compact('barangs', 'allBarangs'));
     }
 
     /**
@@ -73,11 +89,26 @@ class BarangController extends Controller
                 $query->where('sub_kategori', $activeSub);
             }
         }
+
+        // Apply search filter
+        if ($request->has('search') && !empty($request->search)) {
+            $searchTerm = $request->search;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('kode_barang', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('nama_barang', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('deskripsi', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('kondisi', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('lokasi', 'like', '%' . $searchTerm . '%');
+            });
+        }
         
+        // Get all barangs for summary statistics (unpaginated, with filters)
+        $allBarangsManage = $query->get();
+
         $barangs = $query->orderBy('nama_barang', 'asc')->paginate(10);
         $categories = config('categories');
         
-        return view('barang.manage', compact('barangs', 'categories', 'activeKategori', 'activeSub'));
+        return view('barang.manage', compact('barangs', 'allBarangsManage', 'categories', 'activeKategori', 'activeSub'));
     }
 
     /**

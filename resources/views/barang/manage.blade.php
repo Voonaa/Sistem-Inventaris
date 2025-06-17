@@ -70,7 +70,7 @@
                 <!-- Summary Section -->
                 <div class="bg-gray-50 rounded-lg p-4 mb-6">
                     <h3 class="text-md font-medium text-gray-700 mb-3">Informasi Ringkas</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
                         <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
                             <div class="flex items-center">
                                 <div class="flex-shrink-0 bg-blue-100 rounded-full p-3">
@@ -80,7 +80,8 @@
                                 </div>
                                 <div class="ml-4">
                                     <div class="text-sm font-medium text-gray-500">Total Barang</div>
-                                    <div class="text-xl font-semibold text-gray-900">{{ $barangs->total() }}</div>
+                                    <div class="text-xl font-semibold text-gray-900">{{ $allBarangsManage->count() }}</div>
+                                    <p class="text-xs text-gray-400 mt-1">Jumlah total jenis barang yang terdaftar.</p>
                                 </div>
                             </div>
                         </div>
@@ -88,25 +89,13 @@
                             <div class="flex items-center">
                                 <div class="flex-shrink-0 bg-green-100 rounded-full p-3">
                                     <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                     </svg>
                                 </div>
                                 <div class="ml-4">
                                     <div class="text-sm font-medium text-gray-500">Barang Kondisi Baik</div>
-                                    <div class="text-xl font-semibold text-gray-900">{{ $barangs->where('kondisi', 'baik')->count() }}</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 bg-red-100 rounded-full p-3">
-                                    <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                </div>
-                                <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-500">Barang Kondisi Rusak</div>
-                                    <div class="text-xl font-semibold text-gray-900">{{ $barangs->where('kondisi', 'rusak')->count() }}</div>
+                                    <div class="text-xl font-semibold text-gray-900">{{ $allBarangsManage->where('kondisi', 'baik')->count() }}</div>
+                                    <p class="text-xs text-gray-400 mt-1">Siap untuk digunakan tanpa masalah.</p>
                                 </div>
                             </div>
                         </div>
@@ -114,12 +103,41 @@
                             <div class="flex items-center">
                                 <div class="flex-shrink-0 bg-yellow-100 rounded-full p-3">
                                     <svg class="h-6 w-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-500">Barang Kondisi Kurang Baik</div>
+                                    <div class="text-xl font-semibold text-gray-900">{{ $allBarangsManage->where('kondisi', 'kurang_baik')->count() }}</div>
+                                    <p class="text-xs text-gray-400 mt-1">Membutuhkan perbaikan minor atau perhatian.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 bg-red-100 rounded-full p-3">
+                                    <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-500">Barang Kondisi Rusak</div>
+                                    <div class="text-xl font-semibold text-gray-900">{{ $allBarangsManage->where('kondisi', 'rusak')->count() }}</div>
+                                    <p class="text-xs text-gray-400 mt-1">Membutuhkan perbaikan besar atau penggantian.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 bg-indigo-100 rounded-full p-3">
+                                    <svg class="h-6 w-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.25 6.75h9.5m-9.5 3.5h9.5m-9.5 3.5h9.5m-9.5 3.5h9.5M4.5 6.75h.008v.008H4.5V6.75ZM4.5 10.25h.008v.008H4.5V10.25ZM4.5 13.75h.008v.008H4.5V13.75ZM4.5 17.25h.008v.008H4.5V17.25Z"></path>
                                     </svg>
                                 </div>
                                 <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-500">Total Jumlah</div>
-                                    <div class="text-xl font-semibold text-gray-900">{{ $barangs->sum('jumlah') }}</div>
+                                    <div class="text-sm font-medium text-gray-500">Total Jumlah Barang</div>
+                                    <div class="text-xl font-semibold text-gray-900">{{ $allBarangsManage->sum('jumlah') }}</div>
+                                    <p class="text-xs text-gray-400 mt-1">Total akumulasi kuantitas semua barang.</p>
                                 </div>
                             </div>
                         </div>
@@ -134,16 +152,23 @@
 
                 <!-- Search Box -->
                 <div class="mb-4">
-                    <div class="relative">
+                    <form action="{{ route('barang.manage') }}" method="GET" class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </div>
-                        <input type="text" id="searchInput" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Cari barang (kode, nama, kategori, kondisi...)">
-                    </div>
+                        <input type="text" name="search" id="searchInput" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Cari barang (kode, nama, kategori, kondisi...)" value="{{ request('search') }}">
+                        @if(request('kategori'))
+                            <input type="hidden" name="kategori" value="{{ request('kategori') }}">
+                        @endif
+                        @if(request('sub'))
+                            <input type="hidden" name="sub" value="{{ request('sub') }}">
+                        @endif
+                        <button type="submit" class="absolute inset-y-0 right-0 px-3 flex items-center text-sm font-medium text-blue-600 hover:text-blue-800">Cari</button>
+                    </form>
                     <div class="mt-1 text-sm text-gray-500">
-                        Hasil pencarian: <span id="searchCount">{{ $barangs->count() }}</span> barang ditemukan
+                        Hasil pencarian: <span id="searchCount">{{ $barangs->total() }}</span> barang ditemukan
                     </div>
                 </div>
 
