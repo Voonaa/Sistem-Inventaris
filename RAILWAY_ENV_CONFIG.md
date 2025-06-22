@@ -81,11 +81,21 @@ FILESYSTEM_DISK=public
 - **Solution**: Menghapus folder yang tidak diperlukan
 - **Result**: Struktur proyek bersih dengan semua file penting di root
 
+### ✅ Node.js 18 Error in Nixpacks
+- **Problem**: `nodejs18` bukan nama paket yang valid di Nix
+- **Solution**: Menggunakan `nodejs-18_x` dan menambahkan `php81Packages.composer`
+- **Result**: Nixpacks.toml sekarang menggunakan nama paket yang benar
+
+### ✅ Procfile Conflict
+- **Problem**: Procfile konflik dengan railway.toml dan nixpacks.toml
+- **Solution**: Menghapus Procfile karena railway.toml sudah mengatur startCommand
+- **Result**: Tidak ada konflik konfigurasi deployment
+
 ## Build Process
 
 Railway akan menjalankan build process berikut:
 
-1. **Setup Phase**: Install PHP 8.1, Node.js 18, npm, libmysqlclient
+1. **Setup Phase**: Install PHP 8.1, php81Packages.composer, Node.js 18, npm, libmysqlclient
 2. **Install Phase**: 
    - `composer install --ignore-platform-reqs --no-dev --optimize-autoloader`
    - `npm ci`
@@ -97,8 +107,51 @@ Railway akan menjalankan build process berikut:
    - `php artisan storage:link`
 4. **Start Phase**: `php artisan serve --host=0.0.0.0 --port=$PORT`
 
+## Configuration Files
+
+### nixpacks.toml ✅
+```toml
+[phases.setup]
+nixPkgs = ["php81", "php81Packages.composer", "nodejs-18_x", "npm", "libmysqlclient"]
+
+[phases.install]
+cmds = [
+    "composer install --ignore-platform-reqs --no-dev --optimize-autoloader",
+    "npm ci",
+    "npm run build"
+]
+
+[phases.build]
+cmds = [
+    "php artisan config:cache",
+    "php artisan route:cache",
+    "php artisan view:cache",
+    "php artisan storage:link"
+]
+
+[start]
+cmd = "php artisan serve --host=0.0.0.0 --port=$PORT"
+
+[variables]
+NIXPACKS_PHP_ROOT_DIR = "/app/public"
+```
+
+### railway.toml ✅
+```toml
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "php artisan serve --host=0.0.0.0 --port=$PORT"
+healthcheckPath = "/"
+healthcheckTimeout = 100
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 10
+```
+
 ## Troubleshooting
 
+- If you get "undefined variable 'nodejs18'", use `nodejs-18_x` in nixpacks.toml
 - If you get "Error: Reading Procfile", check for conflict markers (<<<<<<< HEAD, =======, >>>>>>>)
 - If you get "source root is package" error, ensure no subfolders with package.json exist
 - If you get JSON syntax errors, validate package.json with `node -e "require('./package.json')"`
@@ -108,9 +161,10 @@ Railway akan menjalankan build process berikut:
 
 ## Current Status
 
-✅ **Procfile**: Fixed and valid  
+✅ **nixpacks.toml**: Fixed nodejs18 error with correct package names  
+✅ **railway.toml**: Properly configured with nixpacks builder  
+✅ **Procfile**: Removed to avoid conflicts  
 ✅ **package.json**: Valid JSON syntax  
-✅ **nixpacks.toml**: Properly configured  
 ✅ **routes/api.php**: No syntax errors  
 ✅ **Project Structure**: Clean root directory  
 ✅ **Build Process**: Tested locally  
