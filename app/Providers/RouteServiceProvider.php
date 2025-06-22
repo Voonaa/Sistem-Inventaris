@@ -20,15 +20,7 @@ class RouteServiceProvider extends ServiceProvider
     public const HOME = '/dashboard';
 
     /**
-     * Register services.
-     */
-    public function register(): void
-    {
-        //
-    }
-
-    /**
-     * Bootstrap services.
+     * Define your route model bindings, pattern filters, and other route configuration.
      */
     public function boot(): void
     {
@@ -37,23 +29,12 @@ class RouteServiceProvider extends ServiceProvider
         });
 
         $this->routes(function () {
-            // Load no-csrf routes with minimal middleware
-            Route::middleware([
-                    \App\Http\Middleware\TrustProxies::class,
-                    \App\Http\Middleware\Cors::class,
-                    \Illuminate\Http\Middleware\HandleCors::class,
-                    \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
-                ])
-                ->group(base_path('routes/nocsrf.php'));
-                
-            // Standard API routes
             Route::middleware('api')
                 ->prefix('api')
                 ->group(base_path('routes/api.php'));
 
-            // Web routes
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));
         });
     }
-}
+} 

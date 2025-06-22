@@ -73,7 +73,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/bukus', [BukuController::class, 'store']);
         Route::put('/bukus/{buku}', [BukuController::class, 'update']);
         Route::delete('/bukus/{buku}', [BukuController::class, 'destroy']);
+<<<<<<< HEAD
         Route::apiResource('peminjaman', PeminjamanController::class);
+=======
+        
+        // Peminjaman - Full CRUD
+        Route::apiResource('peminjaman-api', PeminjamanController::class);
+>>>>>>> versi-seeder-lama
         Route::get('/peminjaman-overdue', [PeminjamanController::class, 'getOverdue']);
         Route::get('/riwayat-barang', [RiwayatBarangController::class, 'index']);
         Route::get('/riwayat-barang/{riwayatBarang}', [RiwayatBarangController::class, 'show']);
