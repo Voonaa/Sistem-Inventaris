@@ -58,8 +58,11 @@ return [
             'strict' => true,
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA', '/etc/ssl/certs/ca-certificates.crt'),
+                PDO::ATTR_TIMEOUT => 5, // Connection timeout (detik)
             ]) : [],
+            'retry_after' => env('DB_RETRY_AFTER', 5), // Custom: waktu tunggu retry (detik)
+            'retries' => env('DB_RETRIES', 3), // Custom: jumlah retry koneksi
         ],
 
         'mariadb' => [

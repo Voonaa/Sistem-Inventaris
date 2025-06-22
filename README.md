@@ -494,3 +494,28 @@ Terima kasih kepada semua kontributor dan pihak yang telah membantu dalam pengem
 ---
 
 **Dibuat untuk SMK Sasmita Jaya 2**
+
+# Railway Deployment Environment Setup
+
+Tambahkan variabel berikut di Railway:
+
+```
+DB_CONNECTION=mysql
+DB_HOST=${MYSQLHOST}
+DB_PORT=${MYSQLPORT}
+DB_DATABASE=${MYSQLDATABASE}
+DB_USERNAME=${MYSQLUSER}
+DB_PASSWORD=${MYSQLPASSWORD}
+APP_URL=https://NAMA-RAILWAY-APP.up.railway.app
+```
+
+Jika MySQL Railway butuh SSL, tambahkan juga:
+```
+MYSQL_ATTR_SSL_CA=/etc/ssl/certs/ca-certificates.crt
+```
+
+Jika ingin retry koneksi database:
+```
+DB_RETRIES=3
+DB_RETRY_AFTER=5
+```
