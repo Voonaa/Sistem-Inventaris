@@ -90,7 +90,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/bukus/{buku}', [BukuController::class, 'destroy']);
         
         // Peminjaman - Full CRUD
-        Route::apiResource('peminjaman', PeminjamanController::class);
+        Route::apiResource('peminjaman-api', PeminjamanController::class);
         Route::get('/peminjaman-overdue', [PeminjamanController::class, 'getOverdue']);
         
         // RiwayatBarang
