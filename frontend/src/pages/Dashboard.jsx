@@ -1,63 +1,57 @@
-import { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Head } from '@inertiajs/react';
 import { useAuthContext } from '@/contexts/AuthContext';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import api from '../services/api';
+
+const StatCard = ({ title, value, children }) => (
+    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-gray-700">{title}</h3>
+        <p className="text-3xl font-bold text-gray-900 mt-2">{value}</p>
+        {children}
+    </div>
+);
 
 export default function Dashboard() {
     const { user, api } = useAuthContext();
-    const [stats, setStats] = useState({
-        totalItems: 0,
-        totalCategories: 0,
-        recentTransactions: [],
-        loading: true,
-        error: null
-    });
+    const [stats, setStats] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    // Fetch dashboard data
     useEffect(() => {
-        const fetchDashboardData = async () => {
-            try {
-                // Get counts separately to avoid errors if one endpoint fails
-                const [itemsResponse, categoriesResponse, transactionsResponse] = await Promise.all([
-                    api.get('/items').catch(() => ({ data: [] })),
-                    api.get('/categories').catch(() => ({ data: [] })),
-                    api.get('/transactions').catch(() => ({ data: [] }))
-                ]);
-                
-                setStats({
-                    totalItems: itemsResponse.data.length || 0,
-                    totalCategories: categoriesResponse.data.length || 0,
-                    recentTransactions: transactionsResponse.data.slice(0, 5) || [],
-                    loading: false,
-                    error: null
-                });
-            } catch (err) {
-                setStats({
-                    ...stats,
-                    loading: false,
-                    error: 'Failed to load dashboard data'
-                });
-                console.error('Error fetching dashboard data:', err);
-            }
-        };
+        api.get('/dashboard')
+            .then(response => {
+                setStats(response.data);
+            })
+            .catch(error => {
+                setError('Failed to fetch dashboard data.');
+                console.error(error);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+    }, []);
 
-        if (user) {
-            fetchDashboardData();
-        }
-    }, [user, api]);
+    if (loading) {
+        return (
+            <AuthenticatedLayout>
+                <div className="p-6 text-center">Loading dashboard...</div>
+            </AuthenticatedLayout>
+        );
+    }
 
-    // Format date
-    const formatDate = (dateString) => {
-        if (!dateString) return 'N/A';
-        return new Date(dateString).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric'
-        });
-    };
+    if (error) {
+        return (
+            <AuthenticatedLayout>
+                <div className="p-6 text-red-500 text-center">{error}</div>
+            </AuthenticatedLayout>
+        );
+    }
 
     return (
-        <AuthenticatedLayout>
+        <AuthenticatedLayout
+            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Dashboard</h2>}
+        >
             <Head title="Dashboard" />
 
             <div className="py-12">
@@ -71,117 +65,14 @@ export default function Dashboard() {
                         </p>
                     </div>
 
-                    {stats.loading ? (
-                        <div className="text-center py-4">
-                            <p>Loading dashboard data...</p>
-                        </div>
-                    ) : stats.error ? (
-                        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
-                            <p>{stats.error}</p>
-                        </div>
-                    ) : (
-                        <>
-                            {/* Stats Cards */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                                <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
-                                    <div className="text-gray-400 dark:text-gray-300 text-sm font-medium">
-                                        Total Items
-                                    </div>
-                                    <div className="text-2xl font-bold text-gray-800 dark:text-white">
-                                        {stats.totalItems}
-                                    </div>
-                                </div>
-                                
-                                <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
-                                    <div className="text-gray-400 dark:text-gray-300 text-sm font-medium">
-                                        Categories
-                                    </div>
-                                    <div className="text-2xl font-bold text-gray-800 dark:text-white">
-                                        {stats.totalCategories}
-                                    </div>
-                                </div>
-                                
-                                <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
-                                    <div className="text-gray-400 dark:text-gray-300 text-sm font-medium">
-                                        Available Items
-                                    </div>
-                                    <div className="text-2xl font-bold text-gray-800 dark:text-white">
-                                        {stats.totalItems} {/* This should be refined in a real implementation */}
-                                    </div>
-                                </div>
-                                
-                                <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
-                                    <div className="text-gray-400 dark:text-gray-300 text-sm font-medium">
-                                        Recent Transactions
-                                    </div>
-                                    <div className="text-2xl font-bold text-gray-800 dark:text-white">
-                                        {stats.recentTransactions.length}
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            {/* Recent Transactions */}
-                            <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                                <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                                    <h3 className="text-lg font-medium text-gray-800 dark:text-white">Recent Transactions</h3>
-                                </div>
-                                <div className="p-6">
-                                    {stats.recentTransactions.length === 0 ? (
-                                        <p className="text-gray-500 dark:text-gray-400">No recent transactions found.</p>
-                                    ) : (
-                                        <div className="overflow-x-auto">
-                                            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                                <thead className="bg-gray-50 dark:bg-gray-700">
-                                                    <tr>
-                                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                                            Type
-                                                        </th>
-                                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                                            Item
-                                                        </th>
-                                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                                            Date
-                                                        </th>
-                                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                                            User
-                                                        </th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                                    {stats.recentTransactions.map((transaction) => (
-                                                        <tr key={transaction.id}>
-                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                                                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                                                    transaction.transaction_type === 'check_out' 
-                                                                        ? 'bg-red-100 text-red-800'
-                                                                        : transaction.transaction_type === 'check_in'
-                                                                        ? 'bg-green-100 text-green-800'
-                                                                        : transaction.transaction_type === 'maintenance'
-                                                                        ? 'bg-yellow-100 text-yellow-800'
-                                                                        : 'bg-blue-100 text-blue-800'
-                                                                }`}>
-                                                                    {transaction.transaction_type?.replace('_', ' ') || 'Unknown'}
-                                                                </span>
-                                                            </td>
-                                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                                                                {transaction.item?.name || 'Unknown item'}
-                                                            </td>
-                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                                                {formatDate(transaction.transaction_date)}
-                                                            </td>
-                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                                                {transaction.user?.name || 'Unknown user'}
-                                                            </td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        </>
-                    )}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <StatCard title="Total Barang" value={stats.total_barang} />
+                        <StatCard title="Total Buku" value={stats.buku.total} />
+                        <StatCard title="Peminjaman Aktif" value={stats.peminjaman_aktif} />
+                        <StatCard title="Total Kategori" value={stats.total_kategori} />
+                    </div>
+
+                    {/* Tambahkan chart atau tabel lain di sini jika perlu */}
                 </div>
             </div>
         </AuthenticatedLayout>
