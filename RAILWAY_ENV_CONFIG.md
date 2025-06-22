@@ -1,118 +1,19 @@
-# Railway Environment Variables Configuration
+# Railway Environment Configuration Guide
 
-## Required Environment Variables for Railway Deployment
+## Latest Fixes Applied (June 23, 2025)
 
-Set the following environment variables in your Railway project dashboard:
+### Fixed Issues:
+1. **"undefined variable 'npm'" error** - Removed `npm` from `nixPkgs` in `nixpacks.toml`
+2. **"undefined variable 'nodejs18'" error** - Changed to `nodejs-18_x`
+3. **Cache issues** - Added `NIXPACKS_VERSION = "2.0"` to force rebuild
+4. **Procfile conflicts** - Removed Procfile, using only `railway.toml` and `nixpacks.toml`
 
-### Application Configuration
-```
-APP_NAME="Inventaris SMK Sasmita"
-APP_ENV=production
-APP_KEY=base64:l5V0+RSbo6bMBqXy8dzbWabLEzwR7G0kjlmq2hZ1eVA=
-APP_DEBUG=false
-APP_URL=https://Sistem-Inventaris.railway.app
-```
+### Current Configuration Files:
 
-### Database Configuration (MySQL)
-```
-DB_CONNECTION=mysql
-DB_HOST=mysql.railway.internal
-DB_PORT=3306
-DB_DATABASE=railway
-DB_USERNAME=root
-DB_PASSWORD=guBuUGOldryGWXYLYVeJyRsaeQasxlJw
-```
-
-### Cache and Session Configuration
-```
-CACHE_DRIVER=database
-SESSION_DRIVER=database
-SESSION_LIFETIME=120
-```
-
-### Nixpacks Configuration
-```
-NIXPACKS_PHP_ROOT_DIR=/app/public
-```
-
-### Additional Configuration
-```
-LOG_CHANNEL=stack
-LOG_LEVEL=info
-BROADCAST_DRIVER=log
-QUEUE_CONNECTION=database
-MAIL_MAILER=log
-MAIL_HOST=127.0.0.1
-MAIL_PORT=2525
-MAIL_USERNAME=null
-MAIL_PASSWORD=null
-MAIL_ENCRYPTION=null
-MAIL_FROM_ADDRESS="hello@example.com"
-MAIL_FROM_NAME="Inventaris SMK Sasmita"
-FILESYSTEM_DISK=public
-```
-
-## Railway Setup Instructions
-
-1. **Create MySQL Service**: Add a new MySQL service in Railway
-2. **Set Environment Variables**: Copy the above variables to your Railway project
-3. **Deploy**: Railway will automatically deploy when you push to GitHub
-4. **Monitor Logs**: Check Railway logs for any deployment issues
-
-## Fixed Issues
-
-### ✅ Procfile Syntax Error
-- **Problem**: Conflict markers Git di Procfile menyebabkan error YAML
-- **Solution**: Menghapus conflict markers dan menggunakan sintaks yang benar
-- **Result**: Procfile sekarang valid dengan web dan release commands
-
-### ✅ Package.json JSON Error  
-- **Problem**: Conflict markers di package.json dan vite.config.js
-- **Solution**: Memperbaiki sintaks JSON dan menghapus conflict markers
-- **Result**: package.json valid dengan scripts dev dan build
-
-### ✅ Routes API Syntax Error
-- **Problem**: Conflict markers di routes/api.php baris 76
-- **Solution**: Menghapus conflict markers dan menggunakan route yang benar
-- **Result**: Route caching berhasil
-
-### ✅ Source Root Issues
-- **Problem**: Folder frontend/ dan Procfile_folder/ menyebabkan kebingungan
-- **Solution**: Menghapus folder yang tidak diperlukan
-- **Result**: Struktur proyek bersih dengan semua file penting di root
-
-### ✅ Node.js 18 Error in Nixpacks
-- **Problem**: `nodejs18` bukan nama paket yang valid di Nix
-- **Solution**: Menggunakan `nodejs-18_x` dan menambahkan `php81Packages.composer`
-- **Result**: Nixpacks.toml sekarang menggunakan nama paket yang benar
-
-### ✅ Procfile Conflict
-- **Problem**: Procfile konflik dengan railway.toml dan nixpacks.toml
-- **Solution**: Menghapus Procfile karena railway.toml sudah mengatur startCommand
-- **Result**: Tidak ada konflik konfigurasi deployment
-
-## Build Process
-
-Railway akan menjalankan build process berikut:
-
-1. **Setup Phase**: Install PHP 8.1, php81Packages.composer, Node.js 18, npm, libmysqlclient
-2. **Install Phase**: 
-   - `composer install --ignore-platform-reqs --no-dev --optimize-autoloader`
-   - `npm ci`
-   - `npm run build`
-3. **Build Phase**:
-   - `php artisan config:cache`
-   - `php artisan route:cache`
-   - `php artisan view:cache`
-   - `php artisan storage:link`
-4. **Start Phase**: `php artisan serve --host=0.0.0.0 --port=$PORT`
-
-## Configuration Files
-
-### nixpacks.toml ✅
+#### nixpacks.toml
 ```toml
 [phases.setup]
-nixPkgs = ["php81", "php81Packages.composer", "nodejs-18_x", "npm", "libmysqlclient"]
+nixPkgs = ["php81", "php81Packages.composer", "nodejs-18_x", "libmysqlclient"]
 
 [phases.install]
 cmds = [
@@ -124,7 +25,6 @@ cmds = [
 [phases.build]
 cmds = [
     "php artisan config:cache",
-    "php artisan route:cache",
     "php artisan view:cache",
     "php artisan storage:link"
 ]
@@ -134,9 +34,10 @@ cmd = "php artisan serve --host=0.0.0.0 --port=$PORT"
 
 [variables]
 NIXPACKS_PHP_ROOT_DIR = "/app/public"
+NIXPACKS_VERSION = "2.0"
 ```
 
-### railway.toml ✅
+#### railway.toml
 ```toml
 [build]
 builder = "nixpacks"
@@ -149,25 +50,142 @@ restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 10
 ```
 
+## Required Environment Variables
+
+Set these variables in Railway Dashboard > Your Project > Variables:
+
+### Application Configuration
+```
+APP_NAME="Inventaris SMK Sasmita"
+APP_ENV=production
+APP_KEY=base64:l5V0+RSbo6bMBqXy8dzbWabLEzwR7G0kjlmq2hZ1eVA=
+APP_URL=https://Sistem-Inventaris.railway.app
+APP_DEBUG=false
+APP_LOG_LEVEL=error
+```
+
+### Database Configuration (MySQL)
+```
+DB_CONNECTION=mysql
+DB_HOST=mysql.railway.internal
+DB_PORT=3306
+DB_DATABASE=railway
+DB_USERNAME=root
+DB_PASSWORD=guBuUGOldryGWXYLYVeJyRsaeQasxlJw
+```
+
+### Cache & Session
+```
+CACHE_DRIVER=database
+SESSION_DRIVER=database
+QUEUE_CONNECTION=sync
+```
+
+### Nixpacks Configuration
+```
+NIXPACKS_PHP_ROOT_DIR=/app/public
+NIXPACKS_VERSION=2.0
+```
+
+### Optional: Mail Configuration (if needed)
+```
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+MAIL_ENCRYPTION=null
+MAIL_FROM_ADDRESS="hello@example.com"
+MAIL_FROM_NAME="${APP_NAME}"
+```
+
+## Build Process
+
+The build process follows this sequence:
+
+1. **Setup Phase**: Install PHP 8.1, Composer, Node.js 18, MySQL client
+2. **Install Phase**: 
+   - Install Composer dependencies (production only)
+   - Install npm dependencies
+   - Build frontend assets
+3. **Build Phase**:
+   - Cache Laravel configuration
+   - Cache Laravel views
+   - Create storage symlink
+4. **Start Phase**: Run Laravel development server
+
 ## Troubleshooting
 
-- If you get "undefined variable 'nodejs18'", use `nodejs-18_x` in nixpacks.toml
-- If you get "Error: Reading Procfile", check for conflict markers (<<<<<<< HEAD, =======, >>>>>>>)
-- If you get "source root is package" error, ensure no subfolders with package.json exist
-- If you get JSON syntax errors, validate package.json with `node -e "require('./package.json')"`
-- Make sure all required files are in the root directory
-- Check that nixpacks.toml is properly configured
-- Ensure routes/api.php has no syntax errors
+### Common Issues:
 
-## Current Status
+1. **"undefined variable 'npm'"**
+   - Solution: npm is included in nodejs-18_x, don't add it separately
 
-✅ **nixpacks.toml**: Fixed nodejs18 error with correct package names  
-✅ **railway.toml**: Properly configured with nixpacks builder  
-✅ **Procfile**: Removed to avoid conflicts  
-✅ **package.json**: Valid JSON syntax  
-✅ **routes/api.php**: No syntax errors  
-✅ **Project Structure**: Clean root directory  
-✅ **Build Process**: Tested locally  
-✅ **Git Operations**: Committed and pushed  
+2. **"undefined variable 'nodejs18'"**
+   - Solution: Use `nodejs-18_x` instead of `nodejs18`
 
-**Ready for Railway deployment!** 🚀 
+3. **Build cache issues**
+   - Solution: Update `NIXPACKS_VERSION` to force rebuild
+
+4. **Database connection issues**
+   - Ensure MySQL service is running
+   - Check DB_HOST is correct (mysql.railway.internal)
+   - Verify credentials
+
+5. **Storage permission issues**
+   - The build process runs `php artisan storage:link`
+   - Ensure storage directory is writable
+
+### Debug Commands:
+
+If you need to debug locally:
+```bash
+# Test composer install
+composer install --ignore-platform-reqs --no-dev --optimize-autoloader
+
+# Test npm build (after npm install)
+npm run build
+
+# Test Laravel commands
+php artisan config:cache
+php artisan view:cache
+php artisan storage:link
+
+# Test database connection
+php artisan migrate:status
+```
+
+## Deployment Checklist
+
+Before deploying:
+- [ ] All environment variables are set in Railway
+- [ ] MySQL service is provisioned and running
+- [ ] nixpacks.toml is in root directory
+- [ ] railway.toml is in root directory
+- [ ] No Procfile exists (to avoid conflicts)
+- [ ] package.json has valid JSON syntax
+- [ ] composer.json has valid JSON syntax
+
+## Monitoring Deployment
+
+1. Go to Railway Dashboard > Your Project
+2. Check the "Deployments" tab
+3. Monitor build logs for any errors
+4. Check application logs after deployment
+5. Test the health check endpoint
+
+## Post-Deployment
+
+After successful deployment:
+1. Run database migrations: `php artisan migrate`
+2. Seed database if needed: `php artisan db:seed`
+3. Test the application at your Railway URL
+4. Monitor application logs for any runtime errors
+
+## Support
+
+If you encounter issues:
+1. Check Railway build logs
+2. Verify environment variables
+3. Test locally with same configuration
+4. Check Laravel logs in Railway dashboard 
