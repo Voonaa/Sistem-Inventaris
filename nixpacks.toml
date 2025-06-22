@@ -1,32 +1,23 @@
 [phases.setup]
-nixPkgs = [
-  "php81", 
-  "php81Packages.composer", 
-  "php81Packages.mysql", 
-  "nodejs-18", 
-  "npm",
-  "libmysqlclient"
-]
+nixPkgs = ["php81", "nodejs18", "npm", "libmysqlclient"]
 
 [phases.install]
 cmds = [
-  "composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist",
-  "npm ci --only=production --prefer-offline"
+    "composer install --ignore-platform-reqs --no-dev --optimize-autoloader",
+    "npm ci",
+    "npm run build"
 ]
 
 [phases.build]
 cmds = [
-  "npm run build",
-  "php artisan config:cache",
-  "php artisan route:cache",
-  "php artisan view:cache",
-  "php artisan storage:link",
-  "php artisan migrate --force"
+    "php artisan config:cache",
+    "php artisan route:cache",
+    "php artisan view:cache",
+    "php artisan storage:link"
 ]
 
 [start]
 cmd = "php artisan serve --host=0.0.0.0 --port=$PORT"
 
 [variables]
-NIXPACKS_PHP_ROOT_DIR = "/app/public"
-APP_KEY = "base64:l5V0+RSbo6bMBqXy8dzbWabLEzwR7G0kjlmq2hZ1eVA=" 
+NIXPACKS_PHP_ROOT_DIR = "/app/public" 
