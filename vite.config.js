@@ -10,9 +10,6 @@ export default defineConfig({
         }),
         react(),
     ],
-<<<<<<< HEAD
-    // base: '/', // Uncomment dan sesuaikan jika asset perlu path khusus
-=======
     server: {
         hmr: {
             host: 'localhost',
@@ -20,5 +17,4 @@ export default defineConfig({
         host: '0.0.0.0',
         port: 5173,
     },
->>>>>>> versi-seeder-lama
 });
