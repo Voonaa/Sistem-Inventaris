@@ -7,12 +7,7 @@
     },
     {
       "src": "api/index.php",
-      "use": "@vercel/php@latest",
-      "config": {
-        "phpVersion": "8.2",
-        "composerOptions": "--no-dev --optimize-autoloader",
-        "maxLambdaSize": "50mb"
-      }
+      "use": "@vercel/php@0.7.3"
     }
   ],
   "routes": [
@@ -55,8 +50,13 @@
     "DB_DATABASE": "/tmp/database.sqlite",
     "CACHE_DRIVER": "array",
     "SESSION_DRIVER": "array",
+    "LOG_CHANNEL": "stderr",
     "VIEW_COMPILED_PATH": "/tmp/views",
-    "SSR_TEMP_PATH": "/tmp/ssr",
-    "NODE_PATH": "node"
+    "ASSET_URL": "https://${VERCEL_URL}",
+    "FILESYSTEM_DISK": "local",
+    "QUEUE_CONNECTION": "sync",
+    "SESSION_LIFETIME": "120",
+    "SANCTUM_STATEFUL_DOMAINS": "${VERCEL_URL}",
+    "VITE_APP_URL": "https://${VERCEL_URL}"
   }
 } 
