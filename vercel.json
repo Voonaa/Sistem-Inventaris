@@ -6,34 +6,49 @@
       "runtime": "vercel-php@0.6.0"
     }
   },
-  "outputDirectory": "public",
   "routes": [
     {
-      "src": "/build/(.*)",
-      "dest": "/build/$1",
+      "src": "/build/(.+)",
+      "dest": "/public/build/$1",
       "headers": {
-        "Cache-Control": "public, max-age=31556952, immutable"
+        "Cache-Control": "public, max-age=31536000, immutable"
       }
     },
     {
+      "src": "/(css|js)/(.+)",
+      "dest": "/public/$1/$2"
+    },
+    {
       "src": "/favicon\\.ico",
-      "dest": "/favicon.ico"
+      "dest": "/public/favicon.ico"
     },
     {
       "src": "/robots\\.txt",
-      "dest": "/robots.txt"
+      "dest": "/public/robots.txt"
     },
     {
-      "src": "/storage/(.*)",
-      "dest": "/storage/$1"
-    },
-    {
-      "src": "/(css|js|images)/(.*)",
-      "dest": "/public/$1/$2"
+      "src": "/assets/(.+)",
+      "dest": "/public/assets/$1"
     },
     {
       "src": "/(.*)",
       "dest": "/api/index.php"
     }
-  ]
+  ],
+  "env": {
+    "APP_NAME": "Sistem Inventaris",
+    "APP_ENV": "production",
+    "APP_DEBUG": "false",
+    "APP_URL": "${VERCEL_URL}",
+    "ASSET_URL": "${VERCEL_URL}",
+    "DB_CONNECTION": "sqlite",
+    "DB_DATABASE": "/tmp/database.sqlite",
+    "CACHE_DRIVER": "array",
+    "SESSION_DRIVER": "array",
+    "LOG_CHANNEL": "stderr",
+    "VIEW_COMPILED_PATH": "/tmp/views",
+    "FILESYSTEM_DISK": "local"
+  },
+  "buildCommand": "./build.sh",
+  "outputDirectory": "public"
 } 
