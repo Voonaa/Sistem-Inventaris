@@ -51,18 +51,18 @@ return [
             'username' => env('DB_USERNAME', 'root'),
             'password' => env('DB_PASSWORD', ''),
             'unix_socket' => env('DB_SOCKET', ''),
-            'charset' => env('DB_CHARSET', 'utf8mb4'),
-            'collation' => env('DB_COLLATION', 'utf8mb4_unicode_ci'),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
             'prefix' => '',
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA', '/etc/ssl/certs/ca-certificates.crt'),
-                PDO::ATTR_TIMEOUT => 5, // Connection timeout (detik)
+                PDO::ATTR_PERSISTENT => true,
+                PDO::ATTR_EMULATE_PREPARES => true,
+                PDO::ATTR_TIMEOUT => 60,
+                PDO::MYSQL_ATTR_LOCAL_INFILE => true,
             ]) : [],
-            'retry_after' => env('DB_RETRY_AFTER', 5), // Custom: waktu tunggu retry (detik)
-            'retries' => env('DB_RETRIES', 3), // Custom: jumlah retry koneksi
         ],
 
         'mariadb' => [
