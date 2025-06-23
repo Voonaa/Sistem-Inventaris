@@ -1,11 +1,16 @@
 {
   "version": 2,
   "framework": null,
-  "functions": {
-    "api/index.php": {
-      "runtime": "vercel-php@0.6.0"
+  "builds": [
+    {
+      "src": "api/index.php",
+      "use": "vercel-php@0.6.0"
+    },
+    {
+      "src": "public/**",
+      "use": "@vercel/static"
     }
-  },
+  ],
   "routes": [
     {
       "src": "/build/(.+)",
@@ -50,15 +55,5 @@
     "FILESYSTEM_DISK": "local"
   },
   "buildCommand": "composer install --no-dev --optimize-autoloader && npm ci && npm run build",
-  "outputDirectory": "public",
-  "builds": [
-    {
-      "src": "api/index.php",
-      "use": "vercel-php@0.6.0"
-    },
-    {
-      "src": "public/**",
-      "use": "@vercel/static"
-    }
-  ]
+  "outputDirectory": "public"
 } 
