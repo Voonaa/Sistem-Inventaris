@@ -49,6 +49,16 @@
     "VIEW_COMPILED_PATH": "/tmp/views",
     "FILESYSTEM_DISK": "local"
   },
-  "buildCommand": "chmod +x build.sh && ./build.sh",
-  "outputDirectory": "public"
+  "buildCommand": "composer install --no-dev --optimize-autoloader && npm ci && npm run build",
+  "outputDirectory": "public",
+  "builds": [
+    {
+      "src": "api/index.php",
+      "use": "vercel-php@0.6.0"
+    },
+    {
+      "src": "public/**",
+      "use": "@vercel/static"
+    }
+  ]
 } 

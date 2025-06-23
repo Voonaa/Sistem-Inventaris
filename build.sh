@@ -5,6 +5,24 @@ set -e
 
 echo "🚀 Starting build process..."
 
+# Install Composer if not available
+if ! [ -x "$(command -v composer)" ]; then
+    echo "📥 Installing Composer..."
+    EXPECTED_CHECKSUM="$(php -r 'copy("https://composer.github.io/installer.sig", "php://stdout");')"
+    php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+    ACTUAL_CHECKSUM="$(php -r "echo hash_file('sha384', 'composer-setup.php');")"
+
+    if [ "$EXPECTED_CHECKSUM" != "$ACTUAL_CHECKSUM" ]; then
+        >&2 echo 'ERROR: Invalid installer checksum'
+        rm composer-setup.php
+        exit 1
+    fi
+
+    php composer-setup.php --quiet
+    rm composer-setup.php
+    mv composer.phar /usr/local/bin/composer
+fi
+
 # Create necessary directories
 echo "📁 Creating temporary directories..."
 mkdir -p /tmp/storage/framework/{sessions,views,cache}
@@ -38,6 +56,7 @@ php artisan view:cache
 
 # Create SQLite database
 echo "🗄️ Setting up database..."
+mkdir -p /tmp
 touch /tmp/database.sqlite
 php artisan migrate --force
 
