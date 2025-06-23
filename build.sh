@@ -31,21 +31,12 @@ echo "🗄️ Setting up database..."
 touch /tmp/database.sqlite
 chmod 777 /tmp/database.sqlite
 
-# Generate application key if not set
-if [ -z "$APP_KEY" ]; then
-    echo "🔑 Generating application key..."
-    php artisan key:generate --show
-fi
-
-# Clear Laravel caches
-echo "🧹 Clearing Laravel caches..."
+# Clear and optimize Laravel
+echo "🧹 Optimizing Laravel..."
 php artisan config:clear
 php artisan cache:clear
 php artisan route:clear
 php artisan view:clear
-
-# Optimize Laravel
-echo "⚡ Optimizing Laravel..."
 php artisan optimize
 
 # Run migrations
@@ -56,5 +47,6 @@ php artisan migrate --force --database=sqlite
 echo "🔒 Setting permissions..."
 chmod -R 777 /tmp
 chmod -R 777 bootstrap/cache
+chmod -R 777 storage
 
 echo "✅ Build process completed!" 

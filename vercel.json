@@ -1,62 +1,39 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "public/**",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "api/index.php",
-      "use": "@vercel/php"
+  "framework": null,
+  "functions": {
+    "api/index.php": {
+      "runtime": "vercel-php@0.6.0"
     }
-  ],
+  },
+  "outputDirectory": "public",
   "routes": [
     {
       "src": "/build/(.*)",
-      "dest": "/public/build/$1",
+      "dest": "/build/$1",
       "headers": {
-        "Cache-Control": "public, max-age=31536000, immutable"
+        "Cache-Control": "public, max-age=31556952, immutable"
       }
     },
     {
-      "src": "/assets/(.*)",
-      "dest": "/public/assets/$1",
-      "headers": {
-        "Cache-Control": "public, max-age=31536000, immutable"
-      }
+      "src": "/favicon\\.ico",
+      "dest": "/favicon.ico"
+    },
+    {
+      "src": "/robots\\.txt",
+      "dest": "/robots.txt"
+    },
+    {
+      "src": "/storage/(.*)",
+      "dest": "/storage/$1"
     },
     {
       "src": "/(css|js|images)/(.*)",
       "dest": "/public/$1/$2"
     },
     {
-      "src": "/favicon.ico",
-      "dest": "/public/favicon.ico"
-    },
-    {
-      "src": "/robots.txt",
-      "dest": "/public/robots.txt"
-    },
-    {
       "src": "/(.*)",
-      "dest": "api/index.php"
+      "dest": "/api/index.php"
     }
-  ],
-  "env": {
-    "APP_ENV": "production",
-    "APP_DEBUG": "false",
-    "APP_URL": "https://${VERCEL_URL}",
-    "DB_CONNECTION": "sqlite",
-    "DB_DATABASE": "/tmp/database.sqlite",
-    "CACHE_DRIVER": "array",
-    "SESSION_DRIVER": "array",
-    "LOG_CHANNEL": "stderr",
-    "VIEW_COMPILED_PATH": "/tmp/views",
-    "ASSET_URL": "https://${VERCEL_URL}",
-    "FILESYSTEM_DISK": "local",
-    "QUEUE_CONNECTION": "sync",
-    "SESSION_LIFETIME": "120",
-    "SANCTUM_STATEFUL_DOMAINS": "${VERCEL_URL}",
-    "VITE_APP_URL": "https://${VERCEL_URL}"
-  }
+  ]
 } 
