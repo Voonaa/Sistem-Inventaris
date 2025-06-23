@@ -1,0 +1,12 @@
+{
+  "buildCommand": "composer install --no-dev --optimize-autoloader && npm ci && npm run build",
+  "outputDirectory": "public",
+  "framework": "other",
+  "devCommand": "php artisan serve",
+  "installCommand": "composer install",
+  "settings": {
+    "php": {
+      "version": "8.2"
+    }
+  }
+} 
