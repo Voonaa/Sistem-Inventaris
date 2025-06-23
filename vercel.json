@@ -4,7 +4,14 @@
   "builds": [
     {
       "src": "api/index.php",
-      "use": "@vercel/php"
+      "use": "@vercel/php",
+      "config": {
+        "php": {
+          "version": "8.2",
+          "composerVersion": "2",
+          "maxLambdaSize": "50mb"
+        }
+      }
     },
     {
       "src": "public/**",
