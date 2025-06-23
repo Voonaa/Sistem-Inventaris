@@ -1,11 +1,49 @@
+# Dependencies
+/node_modules
+/vendor
+
+# Laravel specific
+/storage/*.key
+/storage/framework/cache/**
+/storage/framework/sessions/**
+/storage/framework/testing/**
+/storage/framework/views/**
+/storage/logs/**
+/bootstrap/cache/**
+
+# Development
 .git
+.gitignore
+.gitattributes
+.editorconfig
 .env
 .env.*
-node_modules
-vendor
-tests
-storage/framework/cache/**
-storage/framework/sessions/**
-storage/framework/views/**
-storage/logs/**
-bootstrap/cache/** 
+!.env.example
+.phpunit.result.cache
+docker-compose.yml
+docker-compose.*.yml
+Dockerfile
+*.log
+*.sqlite
+*.sqlite-journal
+
+# IDE
+.idea
+.vscode
+*.sublime-project
+*.sublime-workspace
+
+# Testing
+/tests
+/phpunit.xml
+.phpunit.result.cache
+
+# Documentation
+/docs
+*.md
+!README.md
+
+# Build artifacts
+/npm-debug.log
+/yarn-error.log
+/.vercel 
