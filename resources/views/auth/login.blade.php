@@ -12,9 +12,10 @@
 
     <div class="text-center mb-8">
         <div class="flex justify-center">
-            <img src="{{ asset('assets/images/logosmk.png') }}" alt="SMK Sasmita Logo" class="h-40 w-auto mb-6">
+            <img src="{{ asset('assets/images/logosmk.png') }}" alt="SMK SASMITA JAYA 2 Logo" class="h-40 w-auto mb-6">
         </div>
         <h2 class="text-2xl font-semibold text-gray-900">Sistem Inventaris</h2>
+        <h3 class="text-xl font-medium text-blue-600 mt-2">SMK SASMITA JAYA 2</h3>
     </div>
 
     <form method="POST" action="{{ route('login') }}" class="space-y-6">
