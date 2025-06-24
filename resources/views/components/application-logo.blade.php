@@ -31,10 +31,10 @@
 
 <div {{ $attributes->merge(['class' => 'flex items-center justify-center ' . $sizeClasses['container']]) }}>
     <div class="flex items-center space-x-3">
-        <img src="{{ asset('assets/images/logosmk.png') }}" alt="SMK Sasmita Logo" class="{{ $sizeClasses['logo'] }} object-contain">
+        <img src="{{ asset('assets/images/logosmk.png') }}" alt="SMK Sasmita Jaya 2 Logo" class="{{ $sizeClasses['logo'] }} object-contain">
         <div class="flex flex-col">
             <span class="{{ $sizeClasses['text']['smk'] }} font-bold text-blue-600">SMK</span>
-            <span class="{{ $sizeClasses['text']['sasmita'] }} font-semibold text-gray-800">SASMITA</span>
+            <span class="{{ $sizeClasses['text']['sasmita'] }} font-semibold text-gray-800">SASMITA JAYA 2</span>
         </div>
     </div>
 </div>

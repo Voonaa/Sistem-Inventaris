@@ -29,7 +29,7 @@
                 <div class="flex flex-col items-center justify-center">
                     <div class="flex flex-col items-center mb-8">
                         <span class="text-5xl font-bold text-blue-600">SMK</span>
-                        <span class="text-4xl font-semibold text-gray-800">SASMITA</span>
+                        <span class="text-4xl font-semibold text-gray-800">SASMITA JAYA 2</span>
                     </div>
                     <h2 class="text-2xl font-semibold text-gray-900">Sistem Inventaris</h2>
                 </div>
