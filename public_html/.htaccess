@@ -1,0 +1,54 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /~sistemi4/
+    
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # Redirect Trailing Slashes If Not A Folder...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+
+    # Send Requests To Front Controller...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+# PHP Settings
+<IfModule mod_php8.c>
+    php_value upload_max_filesize 64M
+    php_value post_max_size 64M
+    php_value max_execution_time 300
+    php_value max_input_time 300
+    php_value memory_limit 256M
+    php_flag display_errors off
+    php_flag log_errors on
+    php_value error_log /home/sistemi4/inventaris-smk-sasmita/storage/logs/php_errors.log
+</IfModule>
+
+# Enable CORS
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+</IfModule>
+
+# Disable directory listing
+Options -Indexes
+
+# Protect hidden files
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Protect sensitive files
+<FilesMatch "^(\.env|\.gitignore|composer\.json|composer\.lock|package\.json|package-lock\.json|webpack\.mix\.js)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Handle errors
+ErrorDocument 500 "Sorry, there was a server error. Please try again later."
+ErrorDocument 404 "Sorry, the page you are looking for could not be found." 

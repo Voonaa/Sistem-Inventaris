@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<?php if (isset($component)) { $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54 = $attributes; } ?>
+<?php $component = App\View\Components\AppLayout::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('app-layout'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(App\View\Components\AppLayout::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+     <?php $__env->slot('header', null, []); ?> 
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            <?php echo e(__('Dashboard')); ?>
+
+        </h2>
+     <?php $__env->endSlot(); ?>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <!-- Welcome Message -->
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                <div class="p-6 bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-2xl font-bold">Selamat Datang, <?php echo e(Auth::user()->name); ?>!</h2>
+                            <p class="mt-1 text-blue-100"><?php echo e(now()->format('l, d F Y')); ?></p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xl font-semibold">Sistem Inventaris</p>
+                            <p class="text-blue-100">SMK Sasmita Jaya</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                <!-- Total Barang -->
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg transform hover:scale-105 transition-transform duration-200">
+                    <div class="p-6">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-blue-100">
+                                <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-500">Total Barang</div>
+                                <div class="text-2xl font-semibold"><?php echo e($totalBarang); ?></div>
+                                <div class="text-xs text-gray-400">Total inventaris tersedia</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Kategori -->
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg transform hover:scale-105 transition-transform duration-200">
+                    <div class="p-6">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-green-100">
+                                <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-500">Total Kategori</div>
+                                <div class="text-2xl font-semibold"><?php echo e($totalKategori); ?></div>
+                                <div class="text-xs text-gray-400">Jenis barang tersedia</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Users -->
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg transform hover:scale-105 transition-transform duration-200">
+                    <div class="p-6">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-purple-100">
+                                <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-500">Total Users</div>
+                                <div class="text-2xl font-semibold"><?php echo e($totalUsers); ?></div>
+                                <div class="text-xs text-gray-400">Pengguna terdaftar</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Peminjaman Aktif -->
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg transform hover:scale-105 transition-transform duration-200">
+                    <div class="p-6">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-yellow-100">
+                                <svg class="h-8 w-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M12 15h.01"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-500">Total Peminjaman</div>
+                                <div class="text-2xl font-semibold"><?php echo e($peminjamanAktif); ?></div>
+                                <div class="text-xs text-gray-400">Total transaksi peminjaman</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Barang Condition Chart -->
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                <div class="p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Analisis Kondisi Barang</h3>
+                    <div class="relative h-96 w-full">
+                        <canvas id="barangConditionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activities and Quick Actions -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Recent Activities -->
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold text-gray-800">Aktivitas Terbaru</h3>
+                            <a href="<?php echo e(route('history.index')); ?>" class="text-blue-500 hover:text-blue-600 text-sm font-medium">Lihat Semua</a>
+                        </div>
+                        <?php if($recentActivities->count() > 0): ?>
+                            <div class="space-y-4">
+                                <?php $__currentLoopData = $recentActivities; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $activity): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <div class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200">
+                                        <div class="flex-shrink-0">
+                                            <?php if($activity->jenis_aktivitas == 'tambah'): ?>
+                                                <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Tambah</span>
+                                            <?php elseif($activity->jenis_aktivitas == 'kurang'): ?>
+                                                <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">Kurang</span>
+                                            <?php elseif($activity->jenis_aktivitas == 'pinjam'): ?>
+                                                <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">Pinjam</span>
+                                            <?php else: ?>
+                                                <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800"><?php echo e(ucfirst($activity->jenis_aktivitas)); ?></span>
+                                            <?php endif; ?>
+                                        </div>
+                                        <div class="ml-3 flex-grow">
+                                            <div class="text-sm font-medium text-gray-900">
+                                                <?php echo e($activity->keterangan); ?>
+
+                                            </div>
+                                            <div class="text-xs text-gray-500 flex justify-between items-center">
+                                                <span><?php echo e($activity->created_at->diffForHumans()); ?></span>
+                                                <span class="text-gray-400">oleh <?php echo e($activity->user->name ?? 'System'); ?></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </div>
+                        <?php else: ?>
+                            <div class="text-center py-8">
+                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                                </svg>
+                                <p class="mt-2 text-gray-500">Belum ada aktivitas</p>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="space-y-6">
+                    <!-- Quick Actions Buttons -->
+                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                        <div class="p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Aksi Cepat</h3>
+                            <div class="grid grid-cols-2 gap-4">
+                                <a href="<?php echo e(route('barang.create')); ?>" class="flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors duration-200">
+                                    <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                    </svg>
+                                    <span class="ml-3 text-sm font-medium text-blue-600">Tambah Barang</span>
+                                </a>
+
+                                <a href="<?php echo e(route('peminjaman.create')); ?>" class="flex items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors duration-200">
+                                    <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                    <span class="ml-3 text-sm font-medium text-green-600">Buat Peminjaman</span>
+                                </a>
+
+                                <a href="<?php echo e(route('laporan.index')); ?>" class="flex items-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors duration-200">
+                                    <svg class="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                    <span class="ml-3 text-sm font-medium text-purple-600">Lihat Laporan</span>
+                                </a>
+
+                                <a href="<?php echo e(route('barang.manage')); ?>" class="flex items-center p-4 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition-colors duration-200">
+                                    <svg class="h-6 w-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    </svg>
+                                    <span class="ml-3 text-sm font-medium text-yellow-600">Kelola Barang</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- System Status -->
+                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                        <div class="p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Status Sistem</h3>
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-600">Barang Perlu Perhatian</span>
+                                    <span class="px-2 py-1 text-xs rounded-full <?php echo e($barangKurangBaik > 0 ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'); ?>">
+                                        <?php echo e($barangKurangBaik ?? 0); ?> Barang
+                                    </span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-600">Peminjaman Terlambat</span>
+                                    <span class="px-2 py-1 text-xs rounded-full <?php echo e($peminjamanTerlambat > 0 ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'); ?>">
+                                        <?php echo e($peminjamanTerlambat ?? 0); ?> Peminjaman
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const ctx = document.getElementById('barangConditionChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Baik', 'Kurang Baik', 'Rusak'],
+                    datasets: [{
+                        data: [<?php echo e($barangBaikCount); ?>, <?php echo e($barangKurangBaikCount); ?>, <?php echo e($barangRusakCount); ?>],
+                        backgroundColor: [
+                            'rgba(75, 192, 192, 0.8)', // Greenish for Baik
+                            'rgba(255, 206, 86, 0.8)', // Yellowish for Kurang Baik
+                            'rgba(255, 99, 132, 0.8)'  // Reddish for Rusak
+                        ],
+                        borderColor: [
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(255, 99, 132, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        label += context.parsed + ' Barang';
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
+                        legend: {
+                            position: 'bottom',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Distribusi Kondisi Barang',
+                            font: {
+                                size: 16
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+ <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>
+<?php $attributes = $__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54; ?>
+<?php unset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>
+<?php $component = $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54; ?>
+<?php unset($__componentOriginal9ac128a9029c0e4701924bd2d73d7f54); ?>
+<?php endif; ?>
+<?php /**PATH C:\laragon\www\inventaris-smk-sasmita\resources\views/dashboard.blade.php ENDPATH**/ ?>

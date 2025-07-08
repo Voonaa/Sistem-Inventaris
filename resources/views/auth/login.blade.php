@@ -14,6 +14,7 @@
         <div class="flex justify-center">
             <img src="{{ asset('assets/images/logosmk.png') }}" alt="SMK Sasmita Logo" class="h-40 w-auto mb-6">
         </div>
+        <div class="text-xl font-bold text-blue-700 mb-2">SISVEN</div>
         <h2 class="text-2xl font-semibold text-gray-900">Sistem Inventaris</h2>
     </div>
 

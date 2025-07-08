@@ -3,6 +3,7 @@
     <div class="flex flex-col items-center justify-center flex-shrink-0 px-4 space-y-3">
         <img src="{{ asset('assets/images/logosmk.png') }}" alt="SMK Sasmita Logo" class="h-24 w-auto">
         <div class="text-center">
+            <div class="text-2xl font-bold text-blue-700 mb-1">SISVEN</div>
             <div class="text-xl font-bold text-blue-600">SMK</div>
             <div class="text-lg font-semibold text-gray-800">SASMITA</div>
         </div>

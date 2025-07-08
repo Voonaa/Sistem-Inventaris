@@ -15,13 +15,13 @@ export default defineConfig({
     ],
     build: {
         outDir: 'public/build',
-        assetsDir: '',
+        emptyOutDir: true,
         manifest: true,
         rollupOptions: {
             output: {
-                manualChunks: undefined,
-            },
-        },
+                manualChunks: undefined
+            }
+        }
     },
     server: {
         hmr: {

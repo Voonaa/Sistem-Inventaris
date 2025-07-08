@@ -12,8 +12,10 @@ use App\Http\Controllers\HistoryController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
-// Redirect root URL to login page
-Route::redirect('/', '/login');
+// Explicit GET route for root path
+Route::get('/', function () {
+    return redirect('/login');
+});
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard

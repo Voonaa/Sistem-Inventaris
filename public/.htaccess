@@ -1,3 +1,6 @@
+# Disable directory listing
+Options -Indexes
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes
@@ -40,11 +43,32 @@
     Header set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>
 
-# Disable directory browsing
-Options -Indexes
+# Handle PHP errors
+php_flag display_startup_errors off
+php_flag display_errors off
+php_flag html_errors off
+php_value docref_root 0
+php_value docref_ext 0
 
 # Deny access to sensitive files
 <FilesMatch "^\.env|composer\.json|composer\.lock|package\.json|package-lock\.json|webpack\.mix\.js|yarn\.lock|\.gitignore|README\.md|phpunit\.xml|\.editorconfig">
     Order allow,deny
     Deny from all
 </FilesMatch>
+
+# Protect sensitive files
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Compress text, html, javascript, css, xml:
+AddOutputFilterByType DEFLATE text/plain
+AddOutputFilterByType DEFLATE text/html
+AddOutputFilterByType DEFLATE text/xml
+AddOutputFilterByType DEFLATE text/css
+AddOutputFilterByType DEFLATE application/xml
+AddOutputFilterByType DEFLATE application/xhtml+xml
+AddOutputFilterByType DEFLATE application/rss+xml
+AddOutputFilterByType DEFLATE application/javascript
+AddOutputFilterByType DEFLATE application/x-javascript
